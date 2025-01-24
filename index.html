@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technik Datenbank</title>
+   <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 99%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-container input,
+        .form-container textarea {
+            margin-bottom: 10px;
+            padding: 8px;
+           width: 100%;
+        }
+        .form-container button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #searchInput {
+            margin-bottom: 20px;
+            padding: 10px;
+            width: 20%;
+            font-size: 16px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .delete-btn, .edit-btn, .timeline-btn {
+            padding: 5px 10px;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .delete-btn { background-color: #f44336; }
+        .delete-btn:hover { background-color: #e53935; }
+        .edit-btn { background-color: #007BFF; }
+        .edit-btn:hover { background-color: #0056b3; }
+        .timeline-btn { background-color: #6c757d; }
+        .timeline-btn:hover { background-color: #5a6268; }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            max-width: 90%;
+			width: 50%;
+	max-width: 80%;
+			border-radius: 10px; /* Abgerundete Ecken */
+            overflow-y: auto;
+        }
+        .popup h3 {
+            margin-top: 0;
+        }
+.popup ul {
+    list-style: none; /* Entfernt Standard-Aufzählungszeichen */
+    padding: 0;
+}
+.popup li::before {
+    content: "•"; /* Fügt einen Punkt vor jedem Listeneintrag hinzu */
+    color: black; /* Farbe des Punktes */
+    font-size: 1.2em; /* Größe des Punktes */
+    margin-right: 10px; /* Abstand zwischen Punkt und Text */
+    display: inline-block;
+    vertical-align: middle;
+}
+        .popup button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .popup button:hover {
+            background-color: #e53935;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+		#columnFilterPopup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    max-width: 300px;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ZPL Datenbank</h1>
+        <!-- Export / Import -->
+        <div><center>
+            <button onclick="exportData()">Exportieren</button>
+            <input type="file" id="importFile" accept=".json" onchange="importData(event)">
+        </center></div>
+        <br><br>
+
+        <!-- Button zum Öffnen des Formulars -->
+        <button id="toggleFormBtn">Neue Artikel hinzufügen</button>
+        <div id="formContainer" class="form-container" style="display: none;">
+            <label for="hersteller">Hersteller</label>
+            <input type="text" id="hersteller" placeholder="z.B. Sony">
+            <label for="artikel">Artikel</label>
+            <input type="text" id="artikel" placeholder="z.B. FX3">
+            <label for="seriennummer">Seriennummer</label>
+            <input type="text" id="seriennummer" placeholder="z.B. 123456789">
+            <label for="anschaffungsdatum">Anschaffungsdatum</label>
+            <input type="date" id="anschaffungsdatum">
+            <label for="zuletztGeprueft">Zuletzt Geprüft</label>
+            <input type="date" id="zuletztGeprueft">
+            <label for="originalLagerort">Original Lagerort</label>
+            <input type="text" id="originalLagerort" placeholder="z.B. ZPL">
+            <label for="lagerort">Lagerort</label>
+            <input type="text" id="lagerort" placeholder="z.B. EB1">
+            <label for="notizen">Notizen</label>
+            <textarea id="notizen" rows="4" placeholder="Geben Sie hier Ihre Notizen ein..."></textarea>
+            <button onclick="addItem()">Artikel hinzufügen</button>
+        </div>
+        <br></br>
+		
+<!-- Button zum Öffnen des Spaltenfilters -->
+        <button id="columnFilterBtn">Spalten filtern</button>
+        <div id="columnFilterPopup" class="popup">
+            <h3>Spalten filtern</h3>
+            <ul>
+                <!-- Vorhandene Spaltenfilter -->
+                <li><label><input type="checkbox" class="column-checkbox" data-column="0" checked> Hersteller</label></li>
+                <li><label><input type="checkbox" class="column-checkbox" data-column="1" checked> Artikel</label></li>
+                <li><label><input type="checkbox" class="column-checkbox" data-column="2" checked> Seriennummer</label></li>
+                <li><label><input type="checkbox" class="column-checkbox" data-column="3" checked> Anschaffungsdatum</label></li>
+                <li><label><input type="checkbox" class="column-checkbox" data-column="4" checked> Zuletzt Geprüft</label></li>
+                <li><label><input type="checkbox" class="column-checkbox" data-column="5" checked> Original Lagerort</label></li>
+                <li><label><input type="checkbox" class="column-checkbox" data-column="6" checked> Lagerort</label></li>
+                <li><label><input type="checkbox" class="column-checkbox" data-column="7" checked> Entleiher</label></li>
+                <li><label><input type="checkbox" class="column-checkbox" data-column="8" checked> Projekt</label></li>
+                <li><label><input type="checkbox" class="column-checkbox" data-column="9" checked> Ausleihdatum</label></li>
+                <li><label><input type="checkbox" class="column-checkbox" data-column="10" checked> Rückgabedatum</label></li>
+                <li><label><input type="checkbox" class="column-checkbox" data-column="11" checked> Notizen</label></li>
+            </ul>
+            <button onclick="closeColumnFilter()">Schließen</button>
+        </div>
+
+        
+<br><br>
+        <!-- Suchfeld -->
+        <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Suchen...">
+
+<!-- Tabelle -->
+        <table id="techTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Hersteller</th>
+                    <th onclick="sortTable(1)">Artikel</th>
+                    <th onclick="sortTable(2)">Seriennummer</th>
+                    <th onclick="sortTable(3)">Anschaffungsdatum</th>
+                    <th onclick="sortTable(4)">Zuletzt Geprüft</th>
+                    <th onclick="sortTable(5)">Original Lagerort</th>
+                    <th onclick="sortTable(6)">Lagerort</th>
+                    <th onclick="sortTable(7)">Entleiher</th>
+                    <th onclick="sortTable(8)">Projekt</th>
+                    <th onclick="sortTable(9)">Ausleihdatum</th>
+                    <th onclick="sortTable(10)">geplante Rückgabe</th>
+                    <th onclick="sortTable(11)">Notizen</th>
+                    <th>Aktionen</th>
+                </tr>
+            </thead>
+    <tbody></tbody>
+</table>
+
+    </div>
+
+    <!-- Popup-Fenster -->
+    <div id="overlay" class="overlay" onclick="closePopup()"></div>
+    <div id="popup" class="popup">
+        <h3>Änderungs-Timeline</h3>
+        <ul id="popupTimelineList"></ul>
+        <button onclick="closePopup()">Schließen</button>
+    </div>
+
+    <script>
+	
+	// Funktion zur Umwandlung des Datums in "Tag, Monat, Jahr"
+function formatDate(dateStr) {
+    if (!dateStr || dateStr === "Nicht angegeben") {
+        return "Nicht angegeben";
+    }
+    const options = { day: "2-digit", month: "long", year: "numeric" };
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("de-DE", options);
+}
+const anschaffungsdatum = document.getElementById("anschaffungsdatum").value;
+const zuletztGeprueft = document.getElementById("zuletztGeprueft").value;
+
+const newItem = {
+    anschaffungsdatum: formatDate(anschaffungsdatum),
+    zuletztGeprueft: formatDate(zuletztGeprueft),
+    // ... andere Felder
+};
+function saveItem(index) {
+    const inputs = document.querySelectorAll("#techTable tbody tr")[index].querySelectorAll("input, textarea");
+    const newAnschaffungsdatum = formatDate(inputs[3].value || "Nicht angegeben");
+    const newZuletztGeprueft = formatDate(inputs[4].value || "Nicht angegeben");
+
+    storedData[index].anschaffungsdatum = newAnschaffungsdatum;
+    storedData[index].zuletztGeprueft = newZuletztGeprueft;
+    // ... andere Änderungen
+    updateTable();
+}
+
+// Funktion zum Umschalten der Sichtbarkeit des Formulars
+document.getElementById("toggleFormBtn").addEventListener("click", function() {
+    const formContainer = document.getElementById("formContainer");
+    if (formContainer.style.display === "none") {
+        formContainer.style.display = "block";
+        this.textContent = "Formular verbergen";
+    } else {
+        formContainer.style.display = "none";
+        this.textContent = "Neue Artikel hinzufügen";
+    }
+});
+
+
+        let storedData = [];
+
+        function addItem() {
+    const hersteller = document.getElementById("hersteller").value.trim();
+    const artikel = document.getElementById("artikel").value.trim();
+    const seriennummer = document.getElementById("seriennummer").value.trim();
+    const anschaffungsdatum = document.getElementById("anschaffungsdatum").value || "Nicht angegeben";
+    const zuletztGeprueft = document.getElementById("zuletztGeprueft").value || "Nicht angegeben";
+    const originalLagerort = document.getElementById("originalLagerort").value.trim() || "Nicht angegeben";
+    const lagerort = document.getElementById("lagerort").value.trim();
+    const notizen = document.getElementById("notizen").value.trim();
+
+    // Überprüfung der Pflichtfelder
+    if (!hersteller || !artikel || !seriennummer || !lagerort) {
+        alert("Bitte füllen Sie alle Pflichtfelder aus: Hersteller, Artikel, Seriennummer und Lagerort!");
+        return;
+    }
+
+    const newItem = {
+        hersteller,
+        artikel,
+        seriennummer,
+        anschaffungsdatum,
+        zuletztGeprueft,
+        originalLagerort,
+        lagerort,
+        notizen,
+        timeline: [`Erstellt am ${new Date().toLocaleString()}`]
+    };
+
+    storedData.push(newItem);
+    updateTable();
+    clearForm();
+}
+
+
+function updateTable() {
+    const tableBody = document.querySelector("#techTable tbody");
+    tableBody.innerHTML = "";
+
+    storedData.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${item.hersteller || "Nicht angegeben"}</td>
+            <td>${item.artikel || "Nicht angegeben"}</td>
+            <td>${item.seriennummer || "Nicht angegeben"}</td>
+            <td>${formatDate(item.anschaffungsdatum)}</td>
+            <td>${formatDate(item.zuletztGeprueft)}</td>
+            <td>${item.originalLagerort || "Nicht angegeben"}</td>
+            <td>${item.lagerort || "Nicht angegeben"}</td>
+            <td>${item.borrower || "Nicht angegeben"}</td>
+            <td>${item.projectTitle || "Nicht angegeben"}</td>
+            <td>${formatDate(item.issueDate)}</td>
+            <td>${formatDate(item.returnDate) || "Nicht angegeben"}</td>
+            <td>${item.notizen || "Nicht angegeben"}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="edit-btn" onclick="editItem(${index})">Bearbeiten</button>
+                    <button class="delete-btn" onclick="deleteItem(${index})">Löschen</button>
+                    <button class="timeline-btn" onclick="viewTimeline(${index})">Timeline</button>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+
+        function deleteItem(index) {
+            if (confirm("Möchten Sie diesen Artikel wirklich löschen?")) {
+                storedData.splice(index, 1);
+                updateTable();
+            }
+        }
+
+        function editItem(index) {
+    const row = document.querySelector(`#techTable tbody`).children[index];
+    const item = storedData[index];
+
+    row.innerHTML = `
+        <td><input type="text" value="${item.hersteller}"></td>
+        <td><input type="text" value="${item.artikel}"></td>
+        <td><input type="text" value="${item.seriennummer}"></td>
+        <td><input type="date" value="${item.anschaffungsdatum || ""}"></td>
+        <td><input type="date" value="${item.zuletztGeprueft || ""}"></td>
+        <td><input type="text" value="${item.originalLagerort}"></td>
+        <td><input type="text" value="${item.lagerort}"></td>
+        <td><input type="text" value="${item.borrower || ""}"></td>
+        <td><input type="text" value="${item.projectTitle || ""}"></td>
+        <td><input type="date" value="${item.issueDate || ""}"></td>
+        <td><input type="date" value="${item.returnDate || ""}"></td>
+        <td><textarea>${item.notizen || ""}</textarea></td>
+        <td>
+            <button class="save-btn" onclick="saveItem(${index})">Speichern</button>
+        </td>
+    `;
+}
+
+
+function saveItem(index) {
+    const row = document.querySelector(`#techTable tbody`).children[index];
+    const inputs = row.querySelectorAll("input, textarea");
+
+    const newHersteller = inputs[0].value.trim();
+    const newArtikel = inputs[1].value.trim();
+    const newSeriennummer = inputs[2].value.trim();
+    const newAnschaffungsdatum = inputs[3].value || "Nicht angegeben";
+    const newZuletztGeprueft = inputs[4].value || "Nicht angegeben";
+    const newOriginalLagerort = inputs[5].value.trim();
+    const newLagerort = inputs[6].value.trim();
+    const newBorrower = inputs[7].value.trim() || "Nicht angegeben";
+    const newProjectTitle = inputs[8].value.trim() || "Nicht angegeben";
+    const newIssueDate = inputs[9].value || "Nicht angegeben";
+    const newReturnDate = inputs[10].value || "Nicht angegeben";
+    const newNotizen = inputs[11].value.trim() || "Nicht angegeben";
+
+    const item = storedData[index];
+    const changes = [];
+
+    // Überprüfe Änderungen und füge sie zur Timeline hinzu
+    if (newHersteller !== item.hersteller) changes.push(`Hersteller von "${item.hersteller}" zu "${newHersteller}"`);
+    if (newArtikel !== item.artikel) changes.push(`Artikel von "${item.artikel}" zu "${newArtikel}"`);
+    if (newSeriennummer !== item.seriennummer) changes.push(`Seriennummer von "${item.seriennummer}" zu "${newSeriennummer}"`);
+    if (newAnschaffungsdatum !== item.anschaffungsdatum) changes.push(`Anschaffungsdatum von "${item.anschaffungsdatum}" zu "${newAnschaffungsdatum}"`);
+    if (newZuletztGeprueft !== item.zuletztGeprueft) changes.push(`Zuletzt Geprüft von "${item.zuletztGeprueft}" zu "${newZuletztGeprueft}"`);
+    if (newOriginalLagerort !== item.originalLagerort) changes.push(`Original Lagerort von "${item.originalLagerort}" zu "${newOriginalLagerort}"`);
+    if (newLagerort !== item.lagerort) changes.push(`Lagerort von "${item.lagerort}" zu "${newLagerort}"`);
+    if (newBorrower !== item.borrower) changes.push(`Entleiher von "${item.borrower}" zu "${newBorrower}"`);
+    if (newProjectTitle !== item.projectTitle) changes.push(`Projekt von "${item.projectTitle}" zu "${newProjectTitle}"`);
+    if (newIssueDate !== item.issueDate) changes.push(`Ausleihdatum von "${item.issueDate}" zu "${newIssueDate}"`);
+    if (newReturnDate !== item.returnDate) changes.push(`Rückgabedatum von "${item.returnDate}" zu "${newReturnDate}"`);
+    if (newNotizen !== item.notizen) changes.push(`Notizen von "${item.notizen}" zu "${newNotizen}"`);
+
+    // Änderungen in Timeline speichern
+    if (changes.length > 0) {
+        item.timeline.unshift(`Bearbeitet am ${new Date().toLocaleString()}: ${changes.join(", ")}`);
+    }
+
+    // Aktualisiere die Daten
+    item.hersteller = newHersteller;
+    item.artikel = newArtikel;
+    item.seriennummer = newSeriennummer;
+    item.anschaffungsdatum = newAnschaffungsdatum;
+    item.zuletztGeprueft = newZuletztGeprueft;
+    item.originalLagerort = newOriginalLagerort;
+    item.lagerort = newLagerort;
+    item.borrower = newBorrower;
+    item.projectTitle = newProjectTitle;
+    item.issueDate = newIssueDate;
+    item.returnDate = newReturnDate;
+    item.notizen = newNotizen;
+
+    updateTable();
+}
+
+
+        function viewTimeline(index) {
+            const item = storedData[index];
+            const popupTimelineList = document.getElementById("popupTimelineList");
+            popupTimelineList.innerHTML = item.timeline.map(entry => `<li>${entry}</li>`).join("");
+
+            document.getElementById("overlay").style.display = "block";
+            document.getElementById("popup").style.display = "block";
+        }
+
+        function closePopup() {
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("popup").style.display = "none";
+        }
+
+        function clearForm() {
+            document.getElementById("hersteller").value = "";
+            document.getElementById("artikel").value = "";
+            document.getElementById("seriennummer").value = "";
+            document.getElementById("anschaffungsdatum").value = "";
+            document.getElementById("zuletztGeprueft").value = "";
+            document.getElementById("originalLagerort").value = "";
+            document.getElementById("lagerort").value = "";
+            document.getElementById("notizen").value = "";
+        }
+
+        function searchTable() {
+            const filter = document.getElementById("searchInput").value.toLowerCase();
+            const rows = document.querySelectorAll("#techTable tbody tr");
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? "" : "none";
+            });
+        }
+
+function exportData() {
+    const dataToExport = {
+        items: storedData,
+        borrowers: borrowers // Exportiere auch Borrower-Daten
+    };
+
+    const dataStr = JSON.stringify(dataToExport, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "technik_datenbank.json";
+    a.click();
+
+    URL.revokeObjectURL(url);
+}
+
+
+function importData(event) {
+    const file = event.target.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+
+                // Importiere items
+                if (importedData.items && Array.isArray(importedData.items)) {
+                    storedData = importedData.items;
+                } else {
+                    throw new Error("Ungültiges JSON-Format: 'items' fehlt oder ist kein Array.");
+                }
+
+                // Importiere borrowers
+                if (importedData.borrowers && Array.isArray(importedData.borrowers)) {
+                    borrowers = importedData.borrowers;
+                } else {
+                    borrowers = []; // Leeres Array, falls nicht vorhanden
+                }
+
+                updateTable();
+                alert("Daten erfolgreich importiert!");
+            } catch (error) {
+                alert("Fehler beim Importieren der Datei: " + error.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+}
+
+let borrowers = []; // Borrower-Daten hier speichern
+
+		
+		let sortOrder = 1; // 1: aufsteigend, -1: absteigend
+
+function sortTable(columnIndex) {
+    storedData.sort((a, b) => {
+        let valA = Object.values(a)[columnIndex] || "";
+        let valB = Object.values(b)[columnIndex] || "";
+
+        // Für Datumsspalten
+        if (columnIndex === 3 || columnIndex === 4) {
+            valA = new Date(valA);
+            valB = new Date(valB);
+        }
+
+        if (valA < valB) return -1 * sortOrder;
+        if (valA > valB) return 1 * sortOrder;
+        return 0;
+    });
+
+    // Reihenfolge wechseln
+    sortOrder *= -1;
+
+    updateTable();
+}
+
+function sortTable(columnIndex) {
+    const headers = document.querySelectorAll("#techTable th");
+    headers.forEach((header, index) => {
+        if (index === columnIndex) {
+            header.textContent = header.textContent.replace(/[\u2191\u2193]/g, "") + (sortOrder === 1 ? " ↑" : " ↓");
+        } else {
+            header.textContent = header.textContent.replace(/[\u2191\u2193]/g, "");
+        }
+    });
+
+    storedData.sort((a, b) => {
+        let valA = Object.values(a)[columnIndex] || "";
+        let valB = Object.values(b)[columnIndex] || "";
+
+        if (columnIndex === 3 || columnIndex === 4) {
+            valA = new Date(valA);
+            valB = new Date(valB);
+        }
+
+        if (valA < valB) return -1 * sortOrder;
+        if (valA > valB) return 1 * sortOrder;
+        return 0;
+    });
+
+    sortOrder *= -1;
+    updateTable();
+}
+
+// Öffnet den Spaltenfilter
+document.getElementById("columnFilterBtn").addEventListener("click", function() {
+    document.getElementById("columnFilterPopup").style.display = "block";
+});
+
+// Schließt den Spaltenfilter
+function closeColumnFilter() {
+    document.getElementById("columnFilterPopup").style.display = "none";
+}
+
+// Event-Listener für die Checkboxen
+document.querySelectorAll(".column-checkbox").forEach(checkbox => {
+    checkbox.addEventListener("change", function() {
+        const columnIndex = parseInt(this.getAttribute("data-column"));
+        const isVisible = this.checked;
+
+        // Zeigt oder verbirgt die entsprechende Spalte
+        const table = document.getElementById("techTable");
+        Array.from(table.rows).forEach(row => {
+            row.cells[columnIndex].style.display = isVisible ? "" : "none";
+        });
+    });
+});
+
+// Standardwerte setzen: "Anschaffungsdatum" ausblenden
+//document.addEventListener("DOMContentLoaded", function() {
+//	    document.querySelector('.column-checkbox[data-column="3"]').checked = false;
+//    document.querySelector('.column-checkbox[data-column="3"]').dispatchEvent(new Event("change"));
+//});
+	reader.onload = function(e) {
+    try {
+        const importedData = JSON.parse(e.target.result);
+        if (!Array.isArray(importedData)) throw new Error("Ungültiges Format");
+        storedData = importedData;
+        updateTable();
+        alert("Daten erfolgreich importiert!");
+    } catch (error) {
+        alert("Fehler beim Importieren: " + error.message);
+    }
+};	
+		
+    </script>
+</body>
+</html>
