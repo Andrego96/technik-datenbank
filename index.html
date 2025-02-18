@@ -4,79 +4,279 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Technik Datenbank</title>
-   <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 99%;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .form-container input,
-        .form-container textarea {
-            margin-bottom: 10px;
-            padding: 8px;
-           width: 100%;
-        }
-        .form-container button {
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .form-container button:hover {
-            background-color: #45a049;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        #searchInput {
-            margin-bottom: 20px;
-            padding: 10px;
-            width: 20%;
-            font-size: 16px;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-        }
-        .delete-btn, .edit-btn, .timeline-btn {
-            padding: 5px 10px;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .delete-btn { background-color: #f44336; }
-        .delete-btn:hover { background-color: #e53935; }
-        .edit-btn { background-color: #007BFF; }
-        .edit-btn:hover { background-color: #0056b3; }
-        .timeline-btn { background-color: #6c757d; }
-        .timeline-btn:hover { background-color: #5a6268; }
-        .popup {
+ <style>
+/* Grundlegendes Styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+/* Container für den Inhalt */
+.container {
+    max-width: 99%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Hauptüberschrift */
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+/* Formular Styling */
+.form-container input,
+.form-container textarea {
+    margin-bottom: 10px;
+    padding: 8px;
+    width: 100%;
+}
+
+.form-container button {
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.form-container button:hover {
+    background-color: #45a049;
+}
+
+/* Suchfeld Styling */
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+#searchInput, 
+#timelineSearchInput,
+#archiveSearchInput { 
+    padding: 10px;
+    font-size: 16px;
+    width: 20%;
+}
+
+#timelineSearchInput {
+    margin-left: auto;
+}
+
+/* Tabellen-Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Alternierende Zeilenfarben */
+#techTable tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+#techTable tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+/* Button-Styling */
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.delete-btn, .edit-btn, .timeline-btn {
+    padding: 5px 10px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.delete-btn { background-color: #f44336; }
+.delete-btn:hover { background-color: #e53935; }
+
+.edit-btn { background-color: #007BFF; }
+.edit-btn:hover { background-color: #0056b3; }
+
+.timeline-btn { background-color: #6c757d; }
+.timeline-btn:hover { background-color: #5a6268; }
+
+/* Pop-up Styling für Bearbeitungsfenster */
+
+
+/* Bearbeiten-Popup kompakter und drei Spalten mit mehr Abstand */
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    width: 50%;
+    max-width: 800px; /* Etwas breiter für bessere Lesbarkeit */
+    border-radius: 10px;
+    overflow-y: auto;
+}
+
+/* Grid mit größerem Abstand zwischen den Spalten */
+.popup .form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 Spalten */
+    gap: 30px; /* Mehr Abstand zwischen den Spalten */
+    row-gap: 15px; /* Abstand zwischen den Zeilen */
+    align-items: center;
+}
+
+/* Volle Breite für große Felder */
+.popup .full-width {
+    grid-column: span 3;
+}
+
+/* Styling für Labels und Inputs */
+.popup label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 3px; /* Kleiner Abstand zwischen Label und Input */
+}
+
+.popup input, .popup textarea, .popup select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Button-Container für Speichern & Abbrechen */
+.popup .button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+
+/* Buttons im Pop-up */
+.popup button {
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.save-btn { background-color: #4CAF50; color: white; }
+.save-btn:hover { background-color: #45a049; }
+
+.cancel-btn { background-color: #f44336; color: white; }
+.cancel-btn:hover { background-color: #e53935; }
+
+/* Overlay für das Popup */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+/* Liste in Pop-ups */
+.popup ul {
+    list-style: none;
+    padding: 0;
+}
+
+.popup li::before {
+    content: "•";
+    color: black;
+    font-size: 1.2em;
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#unlockButton {
+    background-color: #f39c12;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: block;
+    margin-bottom: 15px;
+}
+
+#unlockButton:hover {
+    background-color: #e67e22;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.delete-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.delete-btn.enabled {
+    cursor: pointer;
+    opacity: 1;
+}
+
+.restore-btn {
+    background-color: #007BFF; /* Blau */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: not-allowed;
+    opacity: 0.5;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: 0.3s ease;
+}
+
+.restore-btn.enabled {
+    cursor: pointer;
+    opacity: 1;
+}
+
+.restore-btn:hover {
+    background-color: #0056b3; /* Dunkleres Blau beim Hover */
+}
+
+        .popup-spalte {
             display: none;
             position: fixed;
             top: 50%;
@@ -92,14 +292,14 @@
 			border-radius: 10px; /* Abgerundete Ecken */
             overflow-y: auto;
         }
-        .popup h3 {
+        .popup-spalte h3 {
             margin-top: 0;
         }
-.popup ul {
+.popup-spalte ul {
     list-style: none; /* Entfernt Standard-Aufzählungszeichen */
     padding: 0;
 }
-.popup li::before {
+.popup-spalte li::before {
     content: "•"; /* Fügt einen Punkt vor jedem Listeneintrag hinzu */
     color: black; /* Farbe des Punktes */
     font-size: 1.2em; /* Größe des Punktes */
@@ -107,7 +307,7 @@
     display: inline-block;
     vertical-align: middle;
 }
-        .popup button {
+        .popup-spalte button {
             margin-top: 10px;
             padding: 10px;
             background-color: #f44336;
@@ -115,20 +315,11 @@
             border: none;
             cursor: pointer;
         }
-        .popup button:hover {
+        .popup-spalte button:hover {
             background-color: #e53935;
         }
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-		#columnFilterPopup {
+		
+#columnFilterPopup {
     display: none;
     position: fixed;
     top: 50%;
@@ -141,205 +332,518 @@
     max-width: 300px;
 }
 
+/* Login-Popup */
+#loginPopup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    width: 300px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+#loginOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+#loginPopup input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+}
+
+/* Gesamt-Timeline Popup */
+#globalTimelinePopup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    width: 50%;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: 10px;
+}
+
+#globalTimelineOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+#globalTimelinePopup ul {
+    list-style: none;
+    padding: 0;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+#globalTimelinePopup li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.filter-container {
+    display: flex;
+    gap: 10px; /* Abstand zwischen den Elementen */
+    align-items: center; /* Vertikal ausrichten */
+    flex-wrap: wrap; /* Falls Bildschirm zu klein ist, brechen die Elemente um */
+}
+
+.filter-container label {
+    font-weight: bold;
+}
+
+.filter-container input {
+    width: 120px; /* Reduziert die Feldbreite */
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.filter-container button {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.filter-container button:hover {
+    background-color: #0056b3;
+}
+
+
+
+
+.dropdown {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    width: 100%;
+    display: none;
+    z-index: 1000;
+}
+
+.dropdown div {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.dropdown div:hover {
+    background: #f0f0f0;
+}
+
     </style>
 </head>
-
-<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"></script>
-
 <body>
+
+<!-- Login-Popup -->
+<div id="loginPopup" class="popup">
+    <h3>Benutzeranmeldung</h3>
+    <label for="username">Benutzername:</label>
+    <select id="usernameSelect">
+        <!-- Die Optionen werden dynamisch aus JavaScript eingefügt--> 
+    </select>
+    <label for="password">Passwort:</label>
+    <input type="password" id="password" placeholder="Passwort eingeben">
+    <button onclick="login()">Anmelden</button>
+</div>
+
+<!-- Overlay für das Login-Popup -->
+<div id="loginOverlay" class="overlay"></div>
+
+
+
     <div class="container">
-        <h1>ZPL Datenbank</h1>
-        <!-- Export / Import -->
+        <h1>ZPL <br> Datenbank / Bestandslisten</h1>
+        <!-- Export / Import
         <div><center>
             <button onclick="exportData()">Exportieren</button>
             <input type="file" id="importFile" accept=".json" onchange="importData(event)">
-        </center></div>
+        </center></div> -->
         <br><br>
 
         <!-- Button zum Öffnen des Formulars -->
         <button id="toggleFormBtn">Neue Artikel hinzufügen</button>
         <div id="formContainer" class="form-container" style="display: none;">
+		<br></br>
+		<label for="kategorie">Kategorie</label><br>
+<select id="kategorie">
+    <option value="nichtdefiniert">Nicht defeniert</option>
+    <option value="Kamera">Kamera</option>
+    <option value="Ton">Ton</option>
+    <option value="Grip">Grip</option>
+    <option value="Licht">Licht</option>
+    <option value="Strom">Strom</option>
+	<option value="Akku">Akku</option>
+	<option value="Stative">Stative</option>
+	<option value="Sonstiges">Sonstiges</option>
+</select><br></br>
+		
+		<label for="stueckzahl">Stückzahl</label>
+<input type="number" id="stueckzahl" value="1" min="1">
             <label for="hersteller">Hersteller</label>
-            <input type="text" id="hersteller" placeholder="z.B. Sony">
-            <label for="artikel">Artikel</label>
-            <input type="text" id="artikel" placeholder="z.B. FX3">
+<input type="text" id="hersteller" list="herstellerListe" placeholder="z.B. Sony">
+<datalist id="herstellerListe"></datalist>
+<label for="artikel">Artikel</label>
+<input type="text" id="artikel" list="artikelListe" placeholder="z.B. FX3">
+<datalist id="artikelListe"></datalist>
             <label for="seriennummer">Seriennummer</label>
             <input type="text" id="seriennummer" placeholder="z.B. 123456789">
+<label for="artikelbeschreibung">Artikelbeschreibung</label>
+<textarea id="artikelbeschreibung" placeholder="Geben Sie hier eine Beschreibung ein..."></textarea>
+<div id="artikelbeschreibungDropdown" class="dropdown"></div>
+			<label for="originalLagerort">Original Lagerort</label>
+<input type="text" id="originalLagerort" list="originalLagerortListe" placeholder="z.B. EB-1, ZPL">
+<datalist id="originalLagerortListe"></datalist>
+<label for="lagerort">Lagerort</label>
+<input type="text" id="lagerort" list="lagerortListe" placeholder="z.B. ZPL, EB1">
+<datalist id="lagerortListe"></datalist>
             <label for="anschaffungsdatum">Anschaffungsdatum</label>
             <input type="date" id="anschaffungsdatum">
             <label for="zuletztGeprueft">Zuletzt Geprüft</label>
             <input type="date" id="zuletztGeprueft">
-            <label for="originalLagerort">Original Lagerort</label>
-            <input type="text" id="originalLagerort" placeholder="z.B. ZPL">
-            <label for="lagerort">Lagerort</label>
-            <input type="text" id="lagerort" placeholder="z.B. EB1">
+            
             <label for="notizen">Notizen</label>
             <textarea id="notizen" rows="4" placeholder="Geben Sie hier Ihre Notizen ein..."></textarea>
+			<label for="artikelBildUrl">Bild-URL</label>
+<input type="url" id="artikelBildUrl" placeholder="https://example.com/bild.jpg">
+
             <button onclick="addItem()">Artikel hinzufügen</button>
         </div>
         <br></br>
 		
 <!-- Button zum Öffnen des Spaltenfilters -->
-        <button id="columnFilterBtn">Spalten filtern</button>
-        <div id="columnFilterPopup" class="popup">
-            <h3>Spalten filtern</h3>
-            <ul>
-                <!-- Vorhandene Spaltenfilter -->
-                <li><label><input type="checkbox" class="column-checkbox" data-column="0" checked> Hersteller</label></li>
-                <li><label><input type="checkbox" class="column-checkbox" data-column="1" checked> Artikel</label></li>
-                <li><label><input type="checkbox" class="column-checkbox" data-column="2" checked> Seriennummer</label></li>
-                <li><label><input type="checkbox" class="column-checkbox" data-column="3" checked> Anschaffungsdatum</label></li>
-                <li><label><input type="checkbox" class="column-checkbox" data-column="4" checked> Zuletzt Geprüft</label></li>
-                <li><label><input type="checkbox" class="column-checkbox" data-column="5" checked> Original Lagerort</label></li>
-                <li><label><input type="checkbox" class="column-checkbox" data-column="6" checked> Lagerort</label></li>
-                <li><label><input type="checkbox" class="column-checkbox" data-column="7" checked> Entleiher</label></li>
-                <li><label><input type="checkbox" class="column-checkbox" data-column="8" checked> Projekt</label></li>
-                <li><label><input type="checkbox" class="column-checkbox" data-column="9" checked> Ausleihdatum</label></li>
-                <li><label><input type="checkbox" class="column-checkbox" data-column="10" checked> Rückgabedatum</label></li>
-                <li><label><input type="checkbox" class="column-checkbox" data-column="11" checked> Notizen</label></li>
-            </ul>
-            <button onclick="closeColumnFilter()">Schließen</button>
-        </div>
-
-        
+<!--<button id="columnFilterBtn">Spalten filtern</button>
+<div id="columnFilterPopup" class="popup-spalte" >
+    <h3>Spalten filtern</h3>
+    <ul>
+	<li><label><input type="checkbox" class="column-checkbox" data-column="0" checked> Stückzahl</label></li>
+	<li><label><input type="checkbox" class="column-checkbox" data-column="1" checked> kategorie</label></li>
+        <li><label><input type="checkbox" class="column-checkbox" data-column="2" checked> Hersteller</label></li>
+        <li><label><input type="checkbox" class="column-checkbox" data-column="3" checked> Artikel</label></li>
+		<li><label><input type="checkbox" class="column-checkbox" data-column="4" checked> Seriennummer</label></li>
+		<li><label><input type="checkbox" class="column-checkbox" data-column="5" checked> Artikelbeschreibung</label></li>
+        <li><label><input type="checkbox" class="column-checkbox" data-column="6" checked> Anschaffungsdatum</label></li>
+        <li><label><input type="checkbox" class="column-checkbox" data-column="7" checked> Zuletzt Geprüft</label></li>
+        <li><label><input type="checkbox" class="column-checkbox" data-column="8" checked> Original Lagerort</label></li>
+        <li><label><input type="checkbox" class="column-checkbox" data-column="9" checked> Lagerort</label></li>
+        <li><label><input type="checkbox" class="column-checkbox" data-column="10" checked> Entleiher</label></li>
+        <li><label><input type="checkbox" class="column-checkbox" data-column="11" checked> Projekt</label></li>
+        <li><label><input type="checkbox" class="column-checkbox" data-column="12" checked> Ausleihdatum</label></li>
+        <li><label><input type="checkbox" class="column-checkbox" data-column="13" checked> geplante Rückgabe</label></li>
+        <li><label><input type="checkbox" class="column-checkbox" data-column="14" checked> Notizen</label></li>
+        <li><label><input type="checkbox" class="column-checkbox" data-column="15" checked> Bild</label></li>
+    </ul>
+    <button onclick="closeColumnFilter()">Schließen</button>
+</div>-->
+	
+		<button onclick="printSelectedData()">Drucken - Ladeliste</button>
+<br><br>	
+		<button onclick="printSelectedData2()">Drucken - Bestandsliste</button>		
 <br><br>
-        <!-- Suchfeld -->
-        <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Suchen...">
+
+<!-- Button zum Öffnen der Gesamt-Timeline -->
+<button onclick="openGlobalTimeline()">🔍 Änderungen der letzten Tage anzeigen</button>
+
+<!-- Gesamt-Timeline-Popup -->
+<div id="globalTimelinePopup" class="popup">
+    <h3>Änderungen nach Zeitraum filtern</h3>
+<div class="filter-container">
+    <label for="startDate">Von:</label>
+    <input type="date" id="startDate">
+
+    <label for="endDate">Bis:</label>
+    <input type="date" id="endDate">
+
+    <button onclick="filterGlobalTimeline()">Filter anwenden</button>
+    <button onclick="clearGlobalTimelineFilter())">Zurücksetzen</button>
+</div>
+
+    <h3>Timeline der letzten 14 Tage</h3>
+    <ul id="globalTimelineList"></ul>
+    <button class="cancel-btn" onclick="closeGlobalTimeline()">Schließen</button>
+</div>
+
+<!-- Overlay für das Timeline-Popup -->
+<div id="globalTimelineOverlay" class="overlay"></div>
+
+
+<br><br>
+
+
+
+
+
+
+
+
+
+
+
+
+<button id="toggleArchiveBtn">📂 Archiv anzeigen</button>
+
+<div id="archiveSection" style="display: none;">
+    <h2>Archivierte Elemente</h2>
+
+    <!-- Suchfeld für das Archiv -->
+    <div class="search-container">
+        <input type="text" id="archiveSearchInput" onkeyup="searchArchive()" placeholder="Archiv durchsuchen...">
+    </div>
+
+    <div id="archiveList"></div>
+</div>
+
+<br><br>
+<div class="search-container">
+    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Suchen...">
+    <input type="text" id="timelineSearchInput" placeholder="Suchen in der Timeline... z.B. Wasserschaden" onkeyup="searchTimeline()">
+</div>
+<div id="timelineResults"></div>
+
+
+
+
 
 <!-- Tabelle -->
         <table id="techTable">
             <thead>
-                <tr>
-                    <th onclick="sortTable(0)">Hersteller</th>
-                    <th onclick="sortTable(1)">Artikel</th>
-                    <th onclick="sortTable(2)">Seriennummer</th>
-                    <th onclick="sortTable(3)">Anschaffungsdatum</th>
-                    <th onclick="sortTable(4)">Zuletzt Geprüft</th>
-                    <th onclick="sortTable(5)">Original Lagerort</th>
-                    <th onclick="sortTable(6)">Lagerort</th>
-                    <th onclick="sortTable(7)">Entleiher</th>
-                    <th onclick="sortTable(8)">Projekt</th>
-                    <th onclick="sortTable(9)">Ausleihdatum</th>
-                    <th onclick="sortTable(10)">geplante Rückgabe</th>
-                    <th onclick="sortTable(11)">Notizen</th>
-                    <th>Aktionen</th>
-                </tr>
-            </thead>
+    <tr>
+        <th onclick="sortTable(0)">Stückzahl</th>
+        <th onclick="sortTable(1)">Kategorie</th>
+        <th onclick="sortTable(2)">Hersteller</th>
+        <th onclick="sortTable(3)">Artikel</th>
+        <th onclick="sortTable(4)">Seriennummer</th>
+        <th onclick="sortTable(5)">Artikelbeschreibung</th>
+        <th onclick="sortTable(6)">Anschaffungsdatum</th>
+        <th onclick="sortTable(7)">Zuletzt Geprüft</th>
+        <th onclick="sortTable(8)">Original Lagerort</th>
+        <th onclick="sortTable(9)">Lagerort</th>
+        <th onclick="sortTable(10)">Entleiher</th>
+        <th onclick="sortTable(11)">Projekt</th>
+        <th onclick="sortTable(12)">Ausleihdatum</th>
+        <th onclick="sortTable(13)">geplante Rückgabe</th>
+        <th onclick="sortTable(14)">Notizen</th>
+        <th onclick="sortTable(15)">Bild</th> <!-- Neue Spalte für das Bild -->
+        <th>Aktionen</th>
+    </tr>
+</thead>
     <tbody></tbody>
 </table>
 
     </div>
+	
+	<div id="overlay" class="overlay" onclick="closePopup()"></div>
 
-    <!-- Popup-Fenster -->
-    <div id="overlay" class="overlay" onclick="closePopup()"></div>
-    <div id="popup" class="popup">
-        <h3>Änderungs-Timeline</h3>
-        <ul id="popupTimelineList"></ul>
-        <button onclick="closePopup()">Schließen</button>
+<div id="timelinePopup" class="popup">
+    <h3>Änderungsprotokoll</h3>
+    <ul id="popupTimelineList"></ul>
+    <button class="cancel-btn" onclick="closePopup()">Schließen</button>
+</div>
+
+
+
+<div id="overlay" class="overlay" onclick="closePopup()"></div>
+<div id="editPopup" class="popup">
+    <h3>Bearbeiten</h3>
+    <div id="popupContent"></div>
+    <div class="button-container">
+        <button class="save-btn" onclick="saveItemFromPopup()">Speichern</button>
+        <button class="cancel-btn" onclick="closePopup()">Abbrechen</button>
     </div>
+</div>
+
 
     <script>
-	
-	
-	 // Deine Firebase-Konfiguration
-  const firebaseConfig = {
-    apiKey: "AIzaSyBWqR6qavlke_AN2oVBTCsprgrFuLKeNdw",
-    authDomain: "technik-datenbank.firebaseapp.com",
-    projectId: "technik-datenbank",
-    storageBucket: "technik-datenbank.firebasestorage.app",
-    messagingSenderId: "437585483893",
-    appId: "1:437585483893:web:850d81da649b1f2093c03c"
-  };
+let currentUser = null; // Speichert den aktuell angemeldeten Benutzer
 
-  // Firebase initialisieren
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-	
-	
-	function addItem() {
-  const hersteller = document.getElementById("hersteller").value.trim();
-  const artikel = document.getElementById("artikel").value.trim();
-  const seriennummer = document.getElementById("seriennummer").value.trim();
-  const anschaffungsdatum = document.getElementById("anschaffungsdatum").value || "Nicht angegeben";
+// Beispiel-Benutzerdatenbank (lokal gespeichert)
+const users = {
+    "André Röse": "123",
+    "Alexander Liebler": "Alex1234",
+    "Peter Winne": "Peter1234",
+    "Wera Dehlwisch": "Wera1234"
+};
 
-  // Daten in Firestore speichern
-  db.collection("technik").add({
-    hersteller,
-    artikel,
-    seriennummer,
-    anschaffungsdatum
-  })
-  .then(() => {
-    alert("Artikel erfolgreich hinzugefügt!");
-    loadData(); // Tabelle aktualisieren
-  })
-  .catch(error => {
-    console.error("Fehler beim Speichern: ", error);
-  });
-}
+// Funktion zum Befüllen des Dropdown-Menüs mit den Benutzernamen
+function populateUserDropdown() {
+    const usernameSelect = document.getElementById("usernameSelect");
+    usernameSelect.innerHTML = ""; // Vorherige Optionen entfernen
 
-	
-	function loadData() {
-  db.collection("technik").get().then((querySnapshot) => {
-    const tableBody = document.querySelector("#techTable tbody");
-    tableBody.innerHTML = ""; // Tabelle leeren
-
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      const row = `
-        <tr>
-          <td>${data.hersteller || "Nicht angegeben"}</td>
-          <td>${data.artikel || "Nicht angegeben"}</td>
-          <td>${data.seriennummer || "Nicht angegeben"}</td>
-          <td>${data.anschaffungsdatum || "Nicht angegeben"}</td>
-        </tr>
-      `;
-      tableBody.innerHTML += row;
+    Object.keys(users).forEach(username => {
+        const option = document.createElement("option");
+        option.value = username;
+        option.textContent = username;
+        usernameSelect.appendChild(option);
     });
-  });
 }
 
-// Lade Daten beim Start der Seite
-document.addEventListener("DOMContentLoaded", loadData);
+// Login-Popup anzeigen und Dropdown-Menü befüllen
+window.onload = function() {
+    populateUserDropdown(); // Dropdown mit Benutzernamen füllen
+    document.getElementById("loginPopup").style.display = "block";
+    document.getElementById("loginOverlay").style.display = "block";
+};
+
+// Login-Funktion mit Dropdown
+async function login() {
+    const username = document.getElementById("usernameSelect").value;
+    const password = document.getElementById("password").value.trim();
+
+    if (users[username] && users[username] === password) {
+        currentUser = username;
+        document.getElementById("loginPopup").style.display = "none";
+        document.getElementById("loginOverlay").style.display = "none";
+        alert("Willkommen, " + username + "! Daten werden geladen...");
+
+        await loadFromDropbox(); // ✅ Daten erst jetzt laden
+    } else {
+        alert("❌ Falsches Passwort!");
+    }
+}
+
+
 
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        alert("Keine Datei ausgewählt!");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+
+            // Prüfen, ob die Hauptdatenbank vorhanden ist
+            if (importedData.items && Array.isArray(importedData.items)) {
+                storedData = importedData.items.map(item => ({
+                    stueckzahl: parseInt(item.stueckzahl) || 0, 
+                    kategorie: item.kategorie ? item.kategorie.trim() : "", 
+                    hersteller: item.hersteller ? item.hersteller.trim() : "", 
+                    artikel: item.artikel ? item.artikel.trim() : "", 
+                    seriennummer: item.seriennummer ? item.seriennummer.trim() : "", 
+                    artikelbeschreibung: item.artikelbeschreibung ? item.artikelbeschreibung.trim() : "", 
+                    anschaffungsdatum: item.anschaffungsdatum ? new Date(item.anschaffungsdatum) : "", 
+                    zuletztGeprueft: item.zuletztGeprueft ? new Date(item.zuletztGeprueft) : "", 
+                    originalLagerort: item.originalLagerort ? item.originalLagerort.trim() : "", 
+                    lagerort: item.lagerort ? item.lagerort.trim() : "", 
+                    borrower: item.borrower ? item.borrower.trim() : "", 
+                    projectTitle: item.projectTitle ? item.projectTitle.trim() : "", 
+                    issueDate: item.issueDate ? new Date(item.issueDate) : "", 
+                    returnDate: item.returnDate ? new Date(item.returnDate) : "", 
+                    notizen: item.notizen ? item.notizen.trim() : "", 
+                    artikelBildUrl: item.artikelBildUrl ? item.artikelBildUrl.trim() : "", 
+                    timeline: item.timeline || []
+                }));
+            } else {
+                throw new Error("Ungültiges JSON-Format: 'items' fehlt oder ist kein Array.");
+            }
+
+            // Prüfen, ob das Archiv vorhanden ist
+            if (importedData.archiv && Array.isArray(importedData.archiv)) {
+                archivData = importedData.archiv.map(item => ({
+                    stueckzahl: parseInt(item.stueckzahl) || 0, 
+                    kategorie: item.kategorie ? item.kategorie.trim() : "", 
+                    hersteller: item.hersteller ? item.hersteller.trim() : "", 
+                    artikel: item.artikel ? item.artikel.trim() : "", 
+                    seriennummer: item.seriennummer ? item.seriennummer.trim() : "", 
+                    artikelbeschreibung: item.artikelbeschreibung ? item.artikelbeschreibung.trim() : "", 
+                    anschaffungsdatum: item.anschaffungsdatum ? new Date(item.anschaffungsdatum) : "", 
+                    zuletztGeprueft: item.zuletztGeprueft ? new Date(item.zuletztGeprueft) : "", 
+                    originalLagerort: item.originalLagerort ? item.originalLagerort.trim() : "", 
+                    lagerort: item.lagerort ? item.lagerort.trim() : "", 
+                    borrower: item.borrower ? item.borrower.trim() : "", 
+                    projectTitle: item.projectTitle ? item.projectTitle.trim() : "", 
+                    issueDate: item.issueDate ? new Date(item.issueDate) : "", 
+                    returnDate: item.returnDate ? new Date(item.returnDate) : "", 
+                    notizen: item.notizen ? item.notizen.trim() : "", 
+                    artikelBildUrl: item.artikelBildUrl ? item.artikelBildUrl.trim() : "", 
+                    timeline: item.timeline || []
+                }));
+            } else {
+                archivData = []; // Falls kein Archiv existiert, leere Liste setzen
+            }
+
+            // Sortiere die Hauptdatenbank nach Lagerort (A → Z) und Kategorie (Z → A)
+            storedData.sort((a, b) => {
+                let lagerortA = a.lagerort.toLowerCase();
+                let lagerortB = b.lagerort.toLowerCase();
+                let kategorieA = a.kategorie.toLowerCase();
+                let kategorieB = b.kategorie.toLowerCase();
+				let herstellerA = a.hersteller.toLowerCase();
+                let herstellerB = b.hersteller.toLowerCase();
+
+                // Erst nach Lagerort sortieren (aufsteigend A → Z)
+                if (lagerortA < lagerortB) return -1;
+                if (lagerortA > lagerortB) return 1;
+
+                // Falls Lagerort gleich ist, nach Kategorie (aufsteigend A → Z)
+                if (kategorieA > kategorieB) return 1;
+                if (kategorieA < kategorieB) return -1;
+
+// Falls Lagerort gleich ist, nach Kategorie (aufsteigend A → Z)
+                if (herstellerA > herstellerB) return 1;
+                if (hersteller < herstellerB) return -1;
+
+                return 0;
+            });
+
+            // UI aktualisieren
+            updateTable();    // Aktualisiert die Haupttabelle
+            updateArchiveUI(); // Aktualisiert die Archiv-Ansicht
+			 updateSuggestions(); // 🔄 Vorschläge neu laden!
+
+            alert("Daten erfolgreich importiert und sortiert!");
+
+        } catch (error) {
+            alert("Fehler beim Importieren der Datei: " + error.message);
+        }
+    };
+
+    reader.readAsText(file);
+}
+
+
+
+
 	
 	
 	// Funktion zur Umwandlung des Datums in "Tag, Monat, Jahr"
 function formatDate(dateStr) {
-    if (!dateStr || dateStr === "Nicht angegeben") {
-        return "Nicht angegeben";
+    if (!dateStr || dateStr === "") {
+        return "";
     }
     const options = { day: "2-digit", month: "long", year: "numeric" };
     const date = new Date(dateStr);
@@ -353,16 +857,7 @@ const newItem = {
     zuletztGeprueft: formatDate(zuletztGeprueft),
     // ... andere Felder
 };
-function saveItem(index) {
-    const inputs = document.querySelectorAll("#techTable tbody tr")[index].querySelectorAll("input, textarea");
-    const newAnschaffungsdatum = formatDate(inputs[3].value || "Nicht angegeben");
-    const newZuletztGeprueft = formatDate(inputs[4].value || "Nicht angegeben");
 
-    storedData[index].anschaffungsdatum = newAnschaffungsdatum;
-    storedData[index].zuletztGeprueft = newZuletztGeprueft;
-    // ... andere Änderungen
-    updateTable();
-}
 
 // Funktion zum Umschalten der Sichtbarkeit des Formulars
 document.getElementById("toggleFormBtn").addEventListener("click", function() {
@@ -376,181 +871,644 @@ document.getElementById("toggleFormBtn").addEventListener("click", function() {
     }
 });
 
+// Funktion zum Umschalten der Sichtbarkeit des Archivs
+document.getElementById("toggleArchiveBtn").addEventListener("click", function() {
+    const archiveSection = document.getElementById("archiveSection");
+    
+    if (archiveSection.style.display === "none") {
+        archiveSection.style.display = "block";
+        this.textContent = "📂 Archiv ausblenden"; // Button-Text ändern
+    } else {
+        archiveSection.style.display = "none";
+        this.textContent = "📂 Archiv anzeigen"; // Button-Text zurücksetzen
+    }
+});
+
+
+
+// **Starte die Funktion beim Laden der Seite**
+document.addEventListener("DOMContentLoaded", function () {
+    updateSuggestions();
+});
 
         let storedData = [];
 
-        function addItem() {
+function addItem() {
+    const stueckzahl = parseInt(document.getElementById("stueckzahl").value) || 1;
+    const kategorie = document.getElementById("kategorie").value;
     const hersteller = document.getElementById("hersteller").value.trim();
     const artikel = document.getElementById("artikel").value.trim();
     const seriennummer = document.getElementById("seriennummer").value.trim();
-    const anschaffungsdatum = document.getElementById("anschaffungsdatum").value || "Nicht angegeben";
-    const zuletztGeprueft = document.getElementById("zuletztGeprueft").value || "Nicht angegeben";
-    const originalLagerort = document.getElementById("originalLagerort").value.trim() || "Nicht angegeben";
+    const artikelbeschreibung = document.getElementById("artikelbeschreibung").value.trim();
+    const anschaffungsdatum = document.getElementById("anschaffungsdatum").value;
+    const zuletztGeprueft = document.getElementById("zuletztGeprueft").value;
+    const originalLagerort = document.getElementById("originalLagerort").value.trim();
     const lagerort = document.getElementById("lagerort").value.trim();
     const notizen = document.getElementById("notizen").value.trim();
+    const artikelBildUrl = document.getElementById("artikelBildUrl").value.trim();
 
-    // Überprüfung der Pflichtfelder
     if (!hersteller || !artikel || !seriennummer || !lagerort) {
         alert("Bitte füllen Sie alle Pflichtfelder aus: Hersteller, Artikel, Seriennummer und Lagerort!");
         return;
     }
 
     const newItem = {
+        stueckzahl,
+        kategorie,
         hersteller,
         artikel,
         seriennummer,
+        artikelbeschreibung,
         anschaffungsdatum,
         zuletztGeprueft,
         originalLagerort,
         lagerort,
         notizen,
-        timeline: [`Erstellt am ${new Date().toLocaleString()}`]
+        artikelBildUrl,
+        timeline: [`Erstellt von ${currentUser} am ${new Date().toLocaleString()}`],
     };
 
     storedData.push(newItem);
     updateTable();
+    updateGlobalTimeline();  // ✅ Timeline aktualisieren
+	  updateSuggestions(); // 🔄 Vorschläge aktualisieren
+
     clearForm();
 }
 
 
-function updateTable() {
-    const tableBody = document.querySelector("#techTable tbody");
-    tableBody.innerHTML = "";
 
-    storedData.forEach((item, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${item.hersteller || "Nicht angegeben"}</td>
-            <td>${item.artikel || "Nicht angegeben"}</td>
-            <td>${item.seriennummer || "Nicht angegeben"}</td>
-            <td>${formatDate(item.anschaffungsdatum)}</td>
-            <td>${formatDate(item.zuletztGeprueft)}</td>
-            <td>${item.originalLagerort || "Nicht angegeben"}</td>
-            <td>${item.lagerort || "Nicht angegeben"}</td>
-            <td>${item.borrower || "Nicht angegeben"}</td>
-            <td>${item.projectTitle || "Nicht angegeben"}</td>
-            <td>${formatDate(item.issueDate)}</td>
-            <td>${formatDate(item.returnDate) || "Nicht angegeben"}</td>
-            <td>${item.notizen || "Nicht angegeben"}</td>
-            <td>
-                <div class="action-buttons">
-                    <button class="edit-btn" onclick="editItem(${index})">Bearbeiten</button>
-                    <button class="delete-btn" onclick="deleteItem(${index})">Löschen</button>
-                    <button class="timeline-btn" onclick="viewTimeline(${index})">Timeline</button>
-                </div>
-            </td>
-        `;
-        tableBody.appendChild(row);
+
+
+let archivData = []; // Neues Array für archivierte Elemente
+
+function deleteItem(index) {
+    if (confirm("Möchtest du dieses Element wirklich ins Archiv verschieben?")) {
+        if (storedData[index]) {
+            let item = storedData[index];
+
+            // Timeline-Eintrag für Archivierung hinzufügen
+            let archiveEntry = `📂 Archiviert von ${currentUser} am ${new Date().toLocaleString()}`;
+            item.timeline.unshift(archiveEntry);
+
+            // Element ins Archiv verschieben
+            archivData.push(item);
+
+            // Element aus der Hauptliste entfernen
+            storedData.splice(index, 1);
+
+            // UI aktualisieren
+            updateTable();
+            updateArchiveUI();
+        }
+    }
+}
+
+
+
+
+
+
+
+let editIndex = -1; // Speichert den Index des aktuell bearbeiteten Elements
+let isEditingArchivedItem = false; // Speichert, ob der Artikel aus dem Archiv ist
+
+function editItem(index, isArchived = false) {
+    console.log(`✏️ editItem() aufgerufen! Index: ${index}, isArchived: ${isArchived}`);
+
+    editIndex = index;
+    isEditingArchivedItem = isArchived; // 🔥 Merken, ob es ein archivierter Artikel ist
+
+    let item = isArchived ? archivData[index] : storedData[index];
+
+    if (!item) {
+        console.error("❌ Fehler: Ungültiger Index", index);
+        return;
+    }
+
+    // Jetzt ist sichergestellt, dass der richtige Artikel geladen wird
+
+    // Falls ein Datum nicht existiert, setzen wir einen leeren String ""
+    const safeDate = (dateStr) => dateStr ? new Date(dateStr).toISOString().split("T")[0] : "";
+
+    document.getElementById("popupContent").innerHTML = `
+    <div class="button-container">
+        <button id="unlockButton" onclick="unlockFields()">🔒</button>
+        <button class="delete-btn" id="deleteButton" onclick="confirmDelete(${index})" disabled>Artikel ins Archiv</button>
+    </div>
+    <div class="form-grid">
+        <div>
+            <label>Hersteller</label>
+            <input type="text" id="edit_hersteller" value="${item.hersteller}" disabled>
+        </div>
+        <div>
+            <label>Artikel</label>
+            <input type="text" id="edit_artikel" value="${item.artikel}" disabled>
+        </div>
+        <div>
+            <label>Seriennummer</label>
+            <input type="text" id="edit_seriennummer" value="${item.seriennummer}" disabled>
+        </div>
+        <div>
+            <label>Kategorie</label>
+            <select id="edit_kategorie" disabled>
+                <option value="nichtdefiniert" ${item.kategorie === "nichtdefiniert" ? "selected" : ""}>Nicht definiert</option>
+                <option value="Kamera" ${item.kategorie === "Kamera" ? "selected" : ""}>Kamera</option>
+                <option value="Ton" ${item.kategorie === "Ton" ? "selected" : ""}>Ton</option>
+                <option value="Grip" ${item.kategorie === "Grip" ? "selected" : ""}>Grip</option>
+                <option value="Licht" ${item.kategorie === "Licht" ? "selected" : ""}>Licht</option>
+                <option value="Strom" ${item.kategorie === "Strom" ? "selected" : ""}>Strom</option>
+                <option value="Akku" ${item.kategorie === "Akku" ? "selected" : ""}>Akku</option>
+                <option value="Stative" ${item.kategorie === "Stative" ? "selected" : ""}>Stative</option>
+                <option value="Sonstiges" ${item.kategorie === "Sonstiges" ? "selected" : ""}>Sonstiges</option>
+            </select>
+        </div>
+        <div>
+            <label>Stückzahl</label>
+            <input type="number" id="edit_stueckzahl" value="${item.stueckzahl}" disabled>
+        </div>
+        <div>
+            <label>Artikelbeschreibung</label>
+            <textarea id="edit_artikelbeschreibung" disabled>${item.artikelbeschreibung}</textarea>
+        </div>
+        <div>
+            <label>Anschaffungsdatum</label>
+            <input type="date" id="edit_anschaffungsdatum" value="${safeDate(item.anschaffungsdatum)}" disabled>
+        </div>
+        <div>
+            <label>Zuletzt Geprüft</label>
+            <input type="date" id="edit_zuletztGeprueft" value="${safeDate(item.zuletztGeprueft)}">
+        </div>
+        <div>
+            <label>Bild-URL</label>
+            <input type="url" id="edit_artikelBildUrl" value="${item.artikelBildUrl}" placeholder="https://example.com/bild.jpg" disabled>
+        </div>
+        <div>
+            <label>Entleiher</label>
+            <input type="text" id="edit_borrower" value="${item.borrower}" disabled>
+        </div>
+        <div>
+            <label>Projekt</label>
+            <input type="text" id="edit_projectTitle" value="${item.projectTitle}" disabled>
+        </div>
+        <div>
+            <label>Ausleihdatum</label>
+            <input type="date" id="edit_issueDate" value="${safeDate(item.issueDate)}" disabled>
+        </div>
+        <div>
+            <label>Geplante Rückgabe</label>
+            <input type="date" id="edit_returnDate" value="${safeDate(item.returnDate)}" disabled>
+        </div>
+        <div class="full-width">
+            <label>Original Lagerort</label>
+            <input type="text" id="edit_originalLagerort" value="${item.originalLagerort}" disabled>
+        </div>
+        <div class="full-width">
+            <label>Lagerort</label>
+            <input type="text" id="edit_lagerort" value="${item.lagerort}">
+        </div>
+        <div class="full-width">
+            <label>Notizen</label>
+            <textarea id="edit_notizen">${item.notizen}</textarea>
+        </div>
+    </div>
+`;
+
+document.getElementById("overlay").style.display = "block";
+document.getElementById("editPopup").style.display = "block";
+}
+
+
+
+function unlockFields() {
+    const password = prompt("Bitte gib das Passwort ein, um die Felder zu entsperren:");
+    const correctPassword = "zpl"; // 🔒 Passwort festlegen
+
+    if (password === correctPassword) {
+        // Alle Felder außer Lagerort und Notizen entsperren
+        document.querySelectorAll("#popupContent input, #popupContent textarea, #popupContent select").forEach(field => {
+            if (field.id !== "edit_lagerort" && field.id !== "edit_notizen") {
+                field.removeAttribute("disabled");
+            }
+        });
+
+        // Löschen-Button aktivieren
+        const deleteButton = document.getElementById("deleteButton");
+        if (deleteButton) {
+            deleteButton.disabled = false;
+            deleteButton.classList.add("enabled");
+            deleteButton.style.cursor = "pointer"; 
+            deleteButton.style.opacity = "1"; 
+        }
+
+        // **Wiederherstellen-Button aktivieren und blau färben**
+        const restoreButton = document.getElementById("restoreButton");
+        if (restoreButton) {
+            restoreButton.disabled = false;
+            restoreButton.classList.add("enabled");
+            restoreButton.style.cursor = "pointer"; 
+            restoreButton.style.opacity = "1"; 
+        }
+
+    } else {
+        alert("Falsches Passwort! Die Felder bleiben gesperrt.");
+    }
+}
+
+
+
+
+function confirmDelete(index) {
+    if (confirm("Möchtest du dieses Element wirklich löschen?")) {
+        deleteItem(index);
+
+        // Popup-Fenster schließen
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("editPopup").style.display = "none";
+    }
+}
+
+
+function searchArchive() {
+    const filter = document.getElementById("archiveSearchInput").value.toLowerCase();
+    const rows = document.querySelectorAll("#archiveTable tbody tr");
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
     });
 }
 
 
-        function deleteItem(index) {
-            if (confirm("Möchten Sie diesen Artikel wirklich löschen?")) {
-                storedData.splice(index, 1);
-                updateTable();
-            }
-        }
+function saveItem(index) {
+    if (!currentUser) {
+        alert("Bitte zuerst einloggen!");
+        return;
+    }
 
-        function editItem(index) {
-    const row = document.querySelector(`#techTable tbody`).children[index];
-    const item = storedData[index];
+    console.log("🔎 Speichern gestartet...");
+    console.log("editIndex:", editIndex, "isEditingArchivedItem:", isEditingArchivedItem);
 
-    row.innerHTML = `
-        <td><input type="text" value="${item.hersteller}"></td>
-        <td><input type="text" value="${item.artikel}"></td>
-        <td><input type="text" value="${item.seriennummer}"></td>
-        <td><input type="date" value="${item.anschaffungsdatum || ""}"></td>
-        <td><input type="date" value="${item.zuletztGeprueft || ""}"></td>
-        <td><input type="text" value="${item.originalLagerort}"></td>
-        <td><input type="text" value="${item.lagerort}"></td>
-        <td><input type="text" value="${item.borrower || ""}"></td>
-        <td><input type="text" value="${item.projectTitle || ""}"></td>
-        <td><input type="date" value="${item.issueDate || ""}"></td>
-        <td><input type="date" value="${item.returnDate || ""}"></td>
-        <td><textarea>${item.notizen || ""}</textarea></td>
-        <td>
-            <button class="save-btn" onclick="saveItem(${index})">Speichern</button>
-        </td>
-    `;
+    let targetArray = isEditingArchivedItem ? archivData : storedData;
+
+    if (!targetArray[index]) {
+        console.error(`❌ Fehler: Ungültiger Index ${index} für ${isEditingArchivedItem ? "archivData" : "storedData"}`);
+        return;
+    }
+
+    console.log(`📌 Speichere in ${isEditingArchivedItem ? "archivData" : "storedData"} an Index ${index}`);
+
+    let item = targetArray[index]; 
+    let changes = [];
+
+    function isValidChange(oldVal, newVal) {
+        const isEmpty = (val) => val === undefined || val === null || val === "" || val === "undefined";
+        return !(isEmpty(oldVal) && isEmpty(newVal)) && oldVal !== newVal;
+    }
+
+    function safeGetValue(id) {
+        let element = document.getElementById(id);
+        return element ? element.value.trim() : "";
+    }
+
+    let newStueckzahl = parseInt(safeGetValue("edit_stueckzahl")) || 1;
+    let newKategorie = document.getElementById("edit_kategorie").value;
+    let newHersteller = safeGetValue("edit_hersteller");
+    let newArtikel = safeGetValue("edit_artikel");
+    let newSeriennummer = safeGetValue("edit_seriennummer");
+    let newArtikelbeschreibung = safeGetValue("edit_artikelbeschreibung");
+    let newAnschaffungsdatum = safeGetValue("edit_anschaffungsdatum");
+    let newZuletztGeprueft = safeGetValue("edit_zuletztGeprueft");
+    let newOriginalLagerort = safeGetValue("edit_originalLagerort");
+    let newLagerort = safeGetValue("edit_lagerort");
+    let newBorrower = safeGetValue("edit_borrower");
+    let newProjectTitle = safeGetValue("edit_projectTitle");
+    let newIssueDate = safeGetValue("edit_issueDate");
+    let newReturnDate = safeGetValue("edit_returnDate");
+    let newNotizen = safeGetValue("edit_notizen");
+    let newArtikelBildUrl = safeGetValue("edit_artikelBildUrl");
+
+    // ✅ Änderungen protokollieren (jetzt inkl. Stückzahl, Artikelbeschreibung und Notizen)
+    if (newStueckzahl !== item.stueckzahl) 
+        changes.push(`Stückzahl von "${item.stueckzahl}" zu "${newStueckzahl}"`);
+
+    if (isValidChange(item.kategorie, newKategorie)) 
+        changes.push(`Kategorie von "${item.kategorie}" zu "${newKategorie}"`);
+
+    if (isValidChange(item.hersteller, newHersteller)) 
+        changes.push(`Hersteller von "${item.hersteller}" zu "${newHersteller}"`);
+
+    if (isValidChange(item.artikel, newArtikel)) 
+        changes.push(`Artikel von "${item.artikel}" zu "${newArtikel}"`);
+
+    if (isValidChange(item.seriennummer, newSeriennummer)) 
+        changes.push(`Seriennummer von "${item.seriennummer}" zu "${newSeriennummer}"`);
+
+    if (isValidChange(item.artikelbeschreibung, newArtikelbeschreibung)) 
+        changes.push(`Artikelbeschreibung geändert von "${item.artikelbeschreibung}" zu "${newArtikelbeschreibung}"`);
+
+    if (isValidChange(item.anschaffungsdatum, newAnschaffungsdatum)) 
+        changes.push(`Anschaffungsdatum von "${item.anschaffungsdatum}" zu "${newAnschaffungsdatum}"`);
+
+    if (isValidChange(item.zuletztGeprueft, newZuletztGeprueft)) 
+        changes.push(`Zuletzt Geprüft von "${item.zuletztGeprueft}" zu "${newZuletztGeprueft}"`);
+
+    if (isValidChange(item.originalLagerort, newOriginalLagerort)) 
+        changes.push(`Original Lagerort von "${item.originalLagerort}" zu "${newOriginalLagerort}"`);
+
+    if (isValidChange(item.lagerort, newLagerort)) 
+        changes.push(`Lagerort von "${item.lagerort}" zu "${newLagerort}"`);
+
+    if (isValidChange(item.borrower, newBorrower)) 
+        changes.push(`Entleiher von "${item.borrower}" zu "${newBorrower}"`);
+
+    if (isValidChange(item.projectTitle, newProjectTitle)) 
+        changes.push(`Projekt von "${item.projectTitle}" zu "${newProjectTitle}"`);
+
+    if (isValidChange(item.issueDate, newIssueDate)) 
+        changes.push(`Ausleihdatum von "${item.issueDate}" zu "${newIssueDate}"`);
+
+    if (isValidChange(item.returnDate, newReturnDate)) 
+        changes.push(`Rückgabedatum von "${item.returnDate}" zu "${newReturnDate}"`);
+
+    if (isValidChange(item.notizen, newNotizen)) 
+        changes.push(`Notizen geändert von "${item.notizen}" zu "${newNotizen}"`);
+
+    if (isValidChange(item.artikelBildUrl, newArtikelBildUrl)) 
+        changes.push(`Bild-URL geändert`);
+
+    if (changes.length > 0) {
+        item.timeline.unshift(`${currentUser} hat am ${new Date().toLocaleString()} geändert: ${changes.join(", ")}`);
+    }
+
+    // **Änderungen speichern**
+    targetArray[index] = {
+        ...targetArray[index], 
+        stueckzahl: newStueckzahl,
+        kategorie: newKategorie,
+        hersteller: newHersteller,
+        artikel: newArtikel,
+        seriennummer: newSeriennummer,
+        artikelbeschreibung: newArtikelbeschreibung,
+        anschaffungsdatum: newAnschaffungsdatum,
+        zuletztGeprueft: newZuletztGeprueft,
+        originalLagerort: newOriginalLagerort,
+        lagerort: newLagerort,
+        borrower: newBorrower,
+        projectTitle: newProjectTitle,
+        issueDate: newIssueDate,
+        returnDate: newReturnDate,
+        notizen: newNotizen,
+        artikelBildUrl: newArtikelBildUrl,
+        timeline: item.timeline
+    };
+
+    console.log("✅ Gespeichert in", isEditingArchivedItem ? "archivData" : "storedData", "Index:", index);
+
+    if (isEditingArchivedItem) {
+        console.log("🔄 UI aktualisiert: Archiv");
+        updateArchiveUI();
+    } else {
+        console.log("🔄 UI aktualisiert: Haupttabelle");
+        updateTable();
+    }
+
+    updateGlobalTimeline();
+    editIndex = -1;  
+    isEditingArchivedItem = false;
+    console.log("✅ Speichern abgeschlossen. Index zurückgesetzt.");
 }
 
 
-function saveItem(index) {
-    const row = document.querySelector(`#techTable tbody`).children[index];
-    const inputs = row.querySelectorAll("input, textarea");
 
-    const newHersteller = inputs[0].value.trim();
-    const newArtikel = inputs[1].value.trim();
-    const newSeriennummer = inputs[2].value.trim();
-    const newAnschaffungsdatum = inputs[3].value || "Nicht angegeben";
-    const newZuletztGeprueft = inputs[4].value || "Nicht angegeben";
-    const newOriginalLagerort = inputs[5].value.trim();
-    const newLagerort = inputs[6].value.trim();
-    const newBorrower = inputs[7].value.trim() || "Nicht angegeben";
-    const newProjectTitle = inputs[8].value.trim() || "Nicht angegeben";
-    const newIssueDate = inputs[9].value || "Nicht angegeben";
-    const newReturnDate = inputs[10].value || "Nicht angegeben";
-    const newNotizen = inputs[11].value.trim() || "Nicht angegeben";
 
-    const item = storedData[index];
-    const changes = [];
 
-    // Überprüfe Änderungen und füge sie zur Timeline hinzu
-    if (newHersteller !== item.hersteller) changes.push(`Hersteller von "${item.hersteller}" zu "${newHersteller}"`);
-    if (newArtikel !== item.artikel) changes.push(`Artikel von "${item.artikel}" zu "${newArtikel}"`);
-    if (newSeriennummer !== item.seriennummer) changes.push(`Seriennummer von "${item.seriennummer}" zu "${newSeriennummer}"`);
-    if (newAnschaffungsdatum !== item.anschaffungsdatum) changes.push(`Anschaffungsdatum von "${item.anschaffungsdatum}" zu "${newAnschaffungsdatum}"`);
-    if (newZuletztGeprueft !== item.zuletztGeprueft) changes.push(`Zuletzt Geprüft von "${item.zuletztGeprueft}" zu "${newZuletztGeprueft}"`);
-    if (newOriginalLagerort !== item.originalLagerort) changes.push(`Original Lagerort von "${item.originalLagerort}" zu "${newOriginalLagerort}"`);
-    if (newLagerort !== item.lagerort) changes.push(`Lagerort von "${item.lagerort}" zu "${newLagerort}"`);
-    if (newBorrower !== item.borrower) changes.push(`Entleiher von "${item.borrower}" zu "${newBorrower}"`);
-    if (newProjectTitle !== item.projectTitle) changes.push(`Projekt von "${item.projectTitle}" zu "${newProjectTitle}"`);
-    if (newIssueDate !== item.issueDate) changes.push(`Ausleihdatum von "${item.issueDate}" zu "${newIssueDate}"`);
-    if (newReturnDate !== item.returnDate) changes.push(`Rückgabedatum von "${item.returnDate}" zu "${newReturnDate}"`);
-    if (newNotizen !== item.notizen) changes.push(`Notizen von "${item.notizen}" zu "${newNotizen}"`);
 
-    // Änderungen in Timeline speichern
+
+
+
+
+
+
+async function saveItemFromPopup() {
+    if (editIndex === -1) {
+        console.error("❌ Fehler: Kein gültiger Index zum Speichern.");
+        return;
+    }
+
+    console.log("🔍 saveItemFromPopup() aufgerufen! editIndex:", editIndex, "isEditingArchivedItem:", isEditingArchivedItem);
+
+    if (isEditingArchivedItem) {
+        console.log("➡ Speichere in archivData...");
+        saveArchivedItem(editIndex);
+    } else {
+        console.log("➡ Speichere in storedData...");
+        saveItem(editIndex);
+    }
+
+    closePopup();
+    editIndex = -1;  
+    isEditingArchivedItem = false;
+
+    console.log("💾 Änderungen gespeichert. Datei wird sofort hochgeladen...");
+
+    // Versuche sofort in Dropbox zu speichern (mit Wiederholungsmechanismus)
+    attemptSaveWithRetry();
+}
+
+async function attemptSaveWithRetry(retries = 5, delay = 5000) {
+    for (let i = 0; i < retries; i++) {
+        if (await checkFileLock()) {
+            console.warn(`⏳ Datei ist gesperrt. Neuer Versuch in ${delay / 1000} Sekunden...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        } else {
+            console.log("🚀 Datei nicht mehr gesperrt, speichere jetzt...");
+            await saveToDropbox(true);
+            return;
+        }
+    }
+    console.error("❌ Konnte nicht speichern: Datei weiterhin gesperrt.");
+}
+
+
+
+
+
+
+function saveArchivedItem(index) {
+    if (index < 0 || index >= archivData.length) {
+        console.error("Fehler: Ungültiger Index beim Speichern des Archiv-Elements.");
+        return;
+    }
+
+    let item = archivData[index];
+    let changes = [];
+
+    function isValidChange(oldVal, newVal) {
+        const isEmpty = (val) => val === undefined || val === null || val === "" || val === "undefined";
+        return !(isEmpty(oldVal) && isEmpty(newVal)) && oldVal !== newVal;
+    }
+
+    function safeGetValue(id) {
+        let element = document.getElementById(id);
+        return element ? element.value.trim() : "";
+    }
+
+    let newStueckzahl = parseInt(safeGetValue("edit_stueckzahl")) || 1;
+    let newKategorie = document.getElementById("edit_kategorie").value;
+    let newHersteller = safeGetValue("edit_hersteller");
+    let newArtikel = safeGetValue("edit_artikel");
+    let newSeriennummer = safeGetValue("edit_seriennummer");
+    let newArtikelbeschreibung = safeGetValue("edit_artikelbeschreibung");
+    let newAnschaffungsdatum = safeGetValue("edit_anschaffungsdatum");
+    let newZuletztGeprueft = safeGetValue("edit_zuletztGeprueft");
+    let newOriginalLagerort = safeGetValue("edit_originalLagerort");
+    let newLagerort = safeGetValue("edit_lagerort");
+    let newBorrower = safeGetValue("edit_borrower");
+    let newProjectTitle = safeGetValue("edit_projectTitle");
+    let newIssueDate = safeGetValue("edit_issueDate");
+    let newReturnDate = safeGetValue("edit_returnDate");
+    let newNotizen = safeGetValue("edit_notizen");
+    let newArtikelBildUrl = safeGetValue("edit_artikelBildUrl");
+
+    // ✅ Änderungen protokollieren (inkl. aller fehlenden Felder)
+    if (newStueckzahl !== item.stueckzahl) 
+        changes.push(`Stückzahl von "${item.stueckzahl}" zu "${newStueckzahl}"`);
+
+    if (isValidChange(item.kategorie, newKategorie)) 
+        changes.push(`Kategorie von "${item.kategorie}" zu "${newKategorie}"`);
+
+    if (isValidChange(item.hersteller, newHersteller)) 
+        changes.push(`Hersteller von "${item.hersteller}" zu "${newHersteller}"`);
+
+    if (isValidChange(item.artikel, newArtikel)) 
+        changes.push(`Artikel von "${item.artikel}" zu "${newArtikel}"`);
+
+    if (isValidChange(item.seriennummer, newSeriennummer)) 
+        changes.push(`Seriennummer von "${item.seriennummer}" zu "${newSeriennummer}"`);
+
+    if (isValidChange(item.artikelbeschreibung, newArtikelbeschreibung)) 
+        changes.push(`Artikelbeschreibung geändert von "${item.artikelbeschreibung}" zu "${newArtikelbeschreibung}"`);
+
+    if (isValidChange(item.anschaffungsdatum, newAnschaffungsdatum)) 
+        changes.push(`Anschaffungsdatum von "${item.anschaffungsdatum}" zu "${newAnschaffungsdatum}"`);
+
+    if (isValidChange(item.zuletztGeprueft, newZuletztGeprueft)) 
+        changes.push(`Zuletzt Geprüft von "${item.zuletztGeprueft}" zu "${newZuletztGeprueft}"`);
+
+    if (isValidChange(item.originalLagerort, newOriginalLagerort)) 
+        changes.push(`Original Lagerort von "${item.originalLagerort}" zu "${newOriginalLagerort}"`);
+
+    if (isValidChange(item.lagerort, newLagerort)) 
+        changes.push(`Lagerort von "${item.lagerort}" zu "${newLagerort}"`);
+
+    if (isValidChange(item.borrower, newBorrower)) 
+        changes.push(`Entleiher von "${item.borrower}" zu "${newBorrower}"`);
+
+    if (isValidChange(item.projectTitle, newProjectTitle)) 
+        changes.push(`Projekt von "${item.projectTitle}" zu "${newProjectTitle}"`);
+
+    if (isValidChange(item.issueDate, newIssueDate)) 
+        changes.push(`Ausleihdatum von "${item.issueDate}" zu "${newIssueDate}"`);
+
+    if (isValidChange(item.returnDate, newReturnDate)) 
+        changes.push(`Rückgabedatum von "${item.returnDate}" zu "${newReturnDate}"`);
+
+    if (isValidChange(item.notizen, newNotizen)) 
+        changes.push(`Notizen geändert von "${item.notizen}" zu "${newNotizen}"`);
+
+    if (isValidChange(item.artikelBildUrl, newArtikelBildUrl)) 
+        changes.push(`Bild-URL geändert`);
+
     if (changes.length > 0) {
         item.timeline.unshift(`Bearbeitet am ${new Date().toLocaleString()}: ${changes.join(", ")}`);
     }
 
-    // Aktualisiere die Daten
-    item.hersteller = newHersteller;
-    item.artikel = newArtikel;
-    item.seriennummer = newSeriennummer;
-    item.anschaffungsdatum = newAnschaffungsdatum;
-    item.zuletztGeprueft = newZuletztGeprueft;
-    item.originalLagerort = newOriginalLagerort;
-    item.lagerort = newLagerort;
-    item.borrower = newBorrower;
-    item.projectTitle = newProjectTitle;
-    item.issueDate = newIssueDate;
-    item.returnDate = newReturnDate;
-    item.notizen = newNotizen;
+    // **Änderungen speichern**
+    archivData[index] = {
+        ...archivData[index], // **Stellt sicher, dass nur das korrekte Objekt geändert wird**
+        stueckzahl: newStueckzahl,
+        kategorie: newKategorie,
+        hersteller: newHersteller,
+        artikel: newArtikel,
+        seriennummer: newSeriennummer,
+        artikelbeschreibung: newArtikelbeschreibung,
+        anschaffungsdatum: newAnschaffungsdatum,
+        zuletztGeprueft: newZuletztGeprueft,
+        originalLagerort: newOriginalLagerort,
+        lagerort: newLagerort,
+        borrower: newBorrower,
+        projectTitle: newProjectTitle,
+        issueDate: newIssueDate,
+        returnDate: newReturnDate,
+        notizen: newNotizen,
+        artikelBildUrl: newArtikelBildUrl,
+        timeline: item.timeline
+    };
 
-    updateTable();
+    console.log("✅ Gespeichert in archivData, Index:", index);
+
+    // **UI aktualisieren**
+    if (isEditingArchivedItem) {
+        console.log("🔄 UI aktualisiert: Archiv");
+        updateArchiveUI();
+    } else {
+        console.log("🔄 UI aktualisiert: Haupttabelle");
+        updateTable();
+    }
 }
 
 
-        function viewTimeline(index) {
-            const item = storedData[index];
-            const popupTimelineList = document.getElementById("popupTimelineList");
-            popupTimelineList.innerHTML = item.timeline.map(entry => `<li>${entry}</li>`).join("");
 
-            document.getElementById("overlay").style.display = "block";
-            document.getElementById("popup").style.display = "block";
-        }
+
+
+
+
+
+
+function viewTimeline(index) {
+    const item = storedData[index];
+
+    if (!item || !item.timeline) {
+        console.error("Fehler: Timeline für diesen Eintrag nicht gefunden.");
+        return;
+    }
+
+    const popupTimelineList = document.getElementById("popupTimelineList");
+    if (!popupTimelineList) {
+        console.error("Fehler: popupTimelineList existiert nicht!");
+        return;
+    }
+
+    // Timeline-Einträge als Liste darstellen
+    popupTimelineList.innerHTML = item.timeline.length > 0
+        ? item.timeline.map(entry => `<li>${entry}</li>`).join("")
+        : "<li>Keine Änderungen protokolliert</li>";
+
+    // Popup sichtbar machen
+    document.getElementById("overlay").style.display = "block";
+    document.getElementById("timelinePopup").style.display = "block";
+}
+
 
         function closePopup() {
-            document.getElementById("overlay").style.display = "none";
-            document.getElementById("popup").style.display = "none";
-        }
+    const overlay = document.getElementById("overlay");
+    const editPopup = document.getElementById("editPopup");
+    const timelinePopup = document.getElementById("timelinePopup");
+
+    if (overlay) overlay.style.display = "none";
+    if (editPopup) editPopup.style.display = "none";
+    if (timelinePopup) timelinePopup.style.display = "none";
+}
 
         function clearForm() {
+		document.getElementById("stueckzahl").value = "1";
+document.getElementById("kategorie").value = "Kamera";
+
             document.getElementById("hersteller").value = "";
             document.getElementById("artikel").value = "";
             document.getElementById("seriennummer").value = "";
+			document.getElementById("artikelbeschreibung").value = "";
             document.getElementById("anschaffungsdatum").value = "";
             document.getElementById("zuletztGeprueft").value = "";
             document.getElementById("originalLagerort").value = "";
@@ -569,8 +1527,9 @@ function saveItem(index) {
 
 function exportData() {
     const dataToExport = {
-        items: storedData,
-        borrowers: borrowers // Exportiere auch Borrower-Daten
+        items: storedData,   
+        archiv: archivData,  
+        borrowers: borrowers 
     };
 
     const dataStr = JSON.stringify(dataToExport, null, 2);
@@ -586,38 +1545,8 @@ function exportData() {
 }
 
 
-function importData(event) {
-    const file = event.target.files[0];
 
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            try {
-                const importedData = JSON.parse(e.target.result);
 
-                // Importiere items
-                if (importedData.items && Array.isArray(importedData.items)) {
-                    storedData = importedData.items;
-                } else {
-                    throw new Error("Ungültiges JSON-Format: 'items' fehlt oder ist kein Array.");
-                }
-
-                // Importiere borrowers
-                if (importedData.borrowers && Array.isArray(importedData.borrowers)) {
-                    borrowers = importedData.borrowers;
-                } else {
-                    borrowers = []; // Leeres Array, falls nicht vorhanden
-                }
-
-                updateTable();
-                alert("Daten erfolgreich importiert!");
-            } catch (error) {
-                alert("Fehler beim Importieren der Datei: " + error.message);
-            }
-        };
-        reader.readAsText(file);
-    }
-}
 
 let borrowers = []; // Borrower-Daten hier speichern
 
@@ -626,13 +1555,33 @@ let borrowers = []; // Borrower-Daten hier speichern
 
 function sortTable(columnIndex) {
     storedData.sort((a, b) => {
-        let valA = Object.values(a)[columnIndex] || "";
-        let valB = Object.values(b)[columnIndex] || "";
+        let valA, valB;
 
-        // Für Datumsspalten
-        if (columnIndex === 3 || columnIndex === 4) {
-            valA = new Date(valA);
-            valB = new Date(valB);
+        switch (columnIndex) {
+            case 0: valA = a.stueckzahl; valB = b.stueckzahl; break;
+            case 1: valA = a.kategorie; valB = b.kategorie; break;
+            case 2: valA = a.hersteller; valB = b.hersteller; break;
+            case 3: valA = a.artikel; valB = b.artikel; break;
+            case 4: valA = a.seriennummer; valB = b.seriennummer; break;
+            case 5: valA = a.artikelbeschreibung; valB = b.artikelbeschreibung; break;
+            case 6: valA = new Date(a.anschaffungsdatum); valB = new Date(b.anschaffungsdatum); break;
+            case 7: valA = new Date(a.zuletztGeprueft); valB = new Date(b.zuletztGeprueft); break;
+            case 8: valA = a.originalLagerort; valB = b.originalLagerort; break;
+            case 9: valA = a.lagerort; valB = b.lagerort; break;
+            case 10: valA = a.borrower; valB = b.borrower; break;
+            case 11: valA = a.projectTitle; valB = b.projectTitle; break;
+            case 12: valA = new Date(a.issueDate); valB = new Date(b.issueDate); break;
+            case 13: valA = new Date(a.returnDate); valB = new Date(b.returnDate); break;
+            case 14: valA = a.notizen; valB = b.notizen; break;
+            default: return 0;
+        }
+
+        // Falls ein Wert `null` oder `undefined` ist, setze ihn auf eine leere Zeichenkette
+        valA = valA ?? "";
+        valB = valB ?? "";
+
+        if (typeof valA === "string" && typeof valB === "string") {
+            return valA.localeCompare(valB, "de-DE") * sortOrder;
         }
 
         if (valA < valB) return -1 * sortOrder;
@@ -640,19 +1589,21 @@ function sortTable(columnIndex) {
         return 0;
     });
 
-    // Reihenfolge wechseln
     sortOrder *= -1;
-
     updateTable();
 }
 
+
+
+
 function sortTable(columnIndex) {
     const headers = document.querySelectorAll("#techTable th");
+
     headers.forEach((header, index) => {
         if (index === columnIndex) {
-            header.textContent = header.textContent.replace(/[\u2191\u2193]/g, "") + (sortOrder === 1 ? " ↑" : " ↓");
+            header.innerHTML = header.innerHTML.replace(/[\u2191\u2193]/g, "") + (sortOrder === 1 ? " ↑" : " ↓");
         } else {
-            header.textContent = header.textContent.replace(/[\u2191\u2193]/g, "");
+            header.innerHTML = header.innerHTML.replace(/[\u2191\u2193]/g, "");
         }
     });
 
@@ -660,9 +1611,13 @@ function sortTable(columnIndex) {
         let valA = Object.values(a)[columnIndex] || "";
         let valB = Object.values(b)[columnIndex] || "";
 
-        if (columnIndex === 3 || columnIndex === 4) {
+        if (columnIndex === 6 || columnIndex === 7 || columnIndex === 12 || columnIndex === 13) {
             valA = new Date(valA);
             valB = new Date(valB);
+        }
+
+        if (typeof valA === "string" && typeof valB === "string") {
+            return valA.localeCompare(valB, "de-DE") * sortOrder;
         }
 
         if (valA < valB) return -1 * sortOrder;
@@ -674,47 +1629,1397 @@ function sortTable(columnIndex) {
     updateTable();
 }
 
-// Öffnet den Spaltenfilter
-document.getElementById("columnFilterBtn").addEventListener("click", function() {
-    document.getElementById("columnFilterPopup").style.display = "block";
-});
 
-// Schließt den Spaltenfilter
-function closeColumnFilter() {
-    document.getElementById("columnFilterPopup").style.display = "none";
+
+		
+		
+function printSelectedData() {
+    // Zeige ein Popup, um die Betreffzeile abzufragen
+    const headerText = prompt("Bitte geben Sie die Betreffzeile ein:", "Druckansicht der gefilterten Daten") || "Druckansicht der gefilterten Daten";
+
+    // Erstelle eine neue Tabelle für den Druck
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow.document.write('<html><head><title>ZPL-Druckansicht</title></head><body>');
+    printWindow.document.write(`<h1>${headerText}</h1>`);
+    printWindow.document.write('<table border="1" style="width:100%; border-collapse:collapse;">');
+    printWindow.document.write('<thead><tr><th>Stückzahl</th><th>Hersteller</th><th>Artikel</th><th>Seriennummer</th><th>Artikelbeschreibung</th></tr></thead>');
+    printWindow.document.write('<tbody>');
+
+    // Nur sichtbare Zeilen der Tabelle verwenden
+    const rows = document.querySelectorAll("#techTable tbody tr");
+    rows.forEach(row => {
+        if (row.style.display !== "none") {
+            const cells = row.querySelectorAll("td");
+            printWindow.document.write('<tr>');
+			printWindow.document.write(`<td>${cells[0].textContent}</td>`); // Stückzahl
+            printWindow.document.write(`<td>${cells[2].textContent}</td>`); // Hersteller
+            printWindow.document.write(`<td>${cells[3].textContent}</td>`); // Artikel
+            printWindow.document.write(`<td>${cells[4].textContent}</td>`); // Seriennummer
+            printWindow.document.write(`<td>${cells[5].textContent}</td>`); // Artikelbeschreibung
+            printWindow.document.write('</tr>');
+        }
+    });
+
+    printWindow.document.write('</tbody></table>');
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+
+    // Fenster drucken
+    printWindow.print();
 }
 
-// Event-Listener für die Checkboxen
-document.querySelectorAll(".column-checkbox").forEach(checkbox => {
-    checkbox.addEventListener("change", function() {
-        const columnIndex = parseInt(this.getAttribute("data-column"));
-        const isVisible = this.checked;
 
-        // Zeigt oder verbirgt die entsprechende Spalte
-        const table = document.getElementById("techTable");
-        Array.from(table.rows).forEach(row => {
-            row.cells[columnIndex].style.display = isVisible ? "" : "none";
-        });
+function printSelectedData2() {
+    // Zeige ein Popup, um die Betreffzeile abzufragen
+    const headerText = prompt("Bitte geben Sie die Betreffzeile ein:", "Druckansicht der gefilterten Daten") || "Druckansicht der gefilterten Daten";
+
+    // Erstelle eine neue Tabelle für den Druck
+    const printWindow = window.open('', '', 'height=600,width=800');
+    printWindow.document.write('<html><head><title>ZPL-Druckansicht</title></head><body>');
+    printWindow.document.write(`<h1>${headerText}</h1>`);
+    printWindow.document.write('<table border="1" style="width:100%; border-collapse:collapse;">');
+    printWindow.document.write('<thead><tr><th>Stückzahl</th><th>Hersteller</th><th>Artikel</th><th>Seriennummer</th><th>Artikelbeschreibung</th><th>Lagerort</th><th>Notizen</th></tr></thead>');
+    printWindow.document.write('<tbody>');
+
+    // Nur sichtbare Zeilen der Tabelle verwenden
+    const rows = document.querySelectorAll("#techTable tbody tr");
+    rows.forEach(row => {
+        if (row.style.display !== "none") {
+            const cells = row.querySelectorAll("td");
+            printWindow.document.write('<tr>');
+			printWindow.document.write(`<td>${cells[0].textContent}</td>`); // Stückzahl
+            printWindow.document.write(`<td>${cells[2].textContent}</td>`); // Hersteller
+            printWindow.document.write(`<td>${cells[3].textContent}</td>`); // Artikel
+            printWindow.document.write(`<td>${cells[4].textContent}</td>`); // Seriennummer
+            printWindow.document.write(`<td>${cells[5].textContent}</td>`); // Artikelbeschreibung
+			printWindow.document.write(`<td>${cells[9].textContent}</td>`); // Lagerort
+			printWindow.document.write(`<td>${cells[14].textContent}</td>`); // Notizen
+            printWindow.document.write('</tr>');
+        }
     });
+
+    printWindow.document.write('</tbody></table>');
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+
+    // Fenster drucken
+    printWindow.print();
+}
+
+function searchTimeline() {
+    const searchTerm = document.getElementById("timelineSearchInput").value.toLowerCase();
+    const resultsContainer = document.getElementById("timelineResults");
+
+    // Falls das Suchfeld leer ist, lösche den Inhalt und zeige nichts an
+    if (searchTerm.trim() === "") {
+        resultsContainer.innerHTML = "";
+        return;
+    }
+
+    let results = [];
+
+    storedData.forEach((item, index) => {
+        const matchingEntries = item.timeline.filter(entry => entry.toLowerCase().includes(searchTerm));
+        if (matchingEntries.length > 0) {
+            results.push({
+                index,
+                hersteller: item.hersteller || "Unbekannt",
+                artikel: item.artikel || "Unbekannt",
+                seriennummer: item.seriennummer || "Keine Seriennummer",
+                eintraege: matchingEntries
+            });
+        }
+    });
+
+    displayTimelineResults(results);
+}
+
+function displayTimelineResults(results) {
+    const resultsContainer = document.getElementById("timelineResults");
+    resultsContainer.innerHTML = "";
+
+    if (results.length === 0) {
+        resultsContainer.innerHTML = "<p>Kein Treffer in den Timelines gefunden.</p>";
+        return;
+    }
+
+    results.forEach(result => {
+        const entryDiv = document.createElement("div");
+        entryDiv.innerHTML = `
+            <h3>🔹 ${result.hersteller} - ${result.artikel} (SN: ${result.seriennummer})</h3>
+            <ul>` + result.eintraege.map(entry => `<li>${entry}</li>`).join("") + `</ul>`;
+        resultsContainer.appendChild(entryDiv);
+    });
+}
+
+function openGlobalTimeline() {
+    document.getElementById("globalTimelinePopup").style.display = "block";
+    document.getElementById("globalTimelineOverlay").style.display = "block";
+    updateGlobalTimeline(); // Zeigt alle Änderungen an
+}
+
+// Funktion zum Aktualisieren der Gesamt-Timeline
+// Funktion zum Parsen von Datumsangaben
+function parseDate(dateString) {
+    console.log("📌 Versuche, Datum zu parsen:", dateString);
+
+    // 🛠 Konvertiere das Datum in ein standardisiertes Format (ISO)
+    const formattedDate = dateString.replace(/(\d{1,2})\.(\d{1,2})\.(\d{4}), (\d{1,2}):(\d{2})(?::(\d{1,2}))?/, 
+        (match, day, month, year, hours, minutes, seconds) => {
+            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds ? seconds.padStart(2, '0') : '00'}`;
+        });
+
+    let parsedDateMillis = Date.parse(formattedDate);
+
+    if (isNaN(parsedDateMillis)) {
+        console.error("⚠️ Konnte das Datum nicht verarbeiten:", dateString);
+        return null;
+    }
+
+    console.log(`✅ Geparstes Datum: ${new Date(parsedDateMillis).toLocaleString()} → Millisekunden: ${parsedDateMillis}`);
+
+    return parsedDateMillis;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+let currentTimelineIndex = 0;
+let allEntries = [];
+
+function updateGlobalTimeline(startDate = null, endDate = null) {
+    const globalTimelineList = document.getElementById("globalTimelineList");
+    if (!globalTimelineList) {
+        console.error("❌ Fehler: globalTimelineList nicht gefunden!");
+        return;
+    }
+    globalTimelineList.innerHTML = "";
+
+    allEntries = [];
+
+    if (!endDate) {
+        endDate = new Date();
+    } else {
+        endDate = parseDate(endDate + ", 23:59:59");
+    }
+
+    if (!startDate) {
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - 14);
+    } else {
+        startDate = parseDate(startDate + ", 00:00:01");
+    }
+
+    function processTimelineData(data, source) {
+        data.forEach((item) => {
+            if (item.timeline && item.timeline.length > 0) {
+                item.timeline.forEach((entry) => {
+                    const dateMatch = entry.match(/am (\d{1,2}\.\d{1,2}\.\d{4}, \d{1,2}:\d{2}(?::\d{2})?)/);
+                    if (!dateMatch || !dateMatch[1]) {
+                        console.warn("⚠️ Konnte kein Datum extrahieren aus:", entry);
+                        return;
+                    }
+
+                    let entryDateMillis = Date.parse(dateMatch[1].replace(
+                        /(\d{1,2})\.(\d{1,2})\.(\d{4}), (\d{1,2}):(\d{2})(?::(\d{1,2}))?/,
+                        (match, day, month, year, hours, minutes, seconds) => {
+                            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds ? seconds.padStart(2, '0') : '00'}`;
+                        }
+                    ));
+
+                    if (entryDateMillis >= startDate && entryDateMillis <= endDate) {
+                        allEntries.push({
+                            date: entryDateMillis,
+                            text: entry,
+                            hersteller: item.hersteller || "Unbekannt",
+                            artikel: item.artikel || "Unbekannt",
+                            seriennummer: item.seriennummer || "Keine Seriennummer",
+                            lagerort: item.lagerort || "Unbekannt",
+                            geaendertVon: entry.split(" ")[0],
+                            aenderung: entry.replace(/.*? am \d{1,2}\.\d{1,2}\.\d{4}, \d{1,2}:\d{2}.*?: /, "")
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    processTimelineData(storedData, "Hauptdaten");
+    processTimelineData(archivData, "Archiv");
+
+    allEntries.sort((a, b) => b.date - a.date);
+
+    if (allEntries.length === 0) {
+        globalTimelineList.innerHTML = "<p>Keine Änderungen im gewählten Zeitraum.</p>";
+    } else {
+        currentTimelineIndex = 0;
+        displayTimelineEntry();
+    }
+}
+
+function displayTimelineEntry() {
+    const globalTimelineList = document.getElementById("globalTimelineList");
+    if (!globalTimelineList || allEntries.length === 0) return;
+
+    const entry = allEntries[currentTimelineIndex];
+    globalTimelineList.innerHTML = `
+        <div>
+            📦 Hersteller + Artikel: <b>${entry.hersteller} - ${entry.artikel}</b><br></br>
+            🔢 Seriennummer: <b>${entry.seriennummer}</b><br></br>
+            📍 Lagerort: <b>${entry.lagerort}</b><br></br>
+            📅 Änderungsdatum: <b>${new Date(entry.date).toLocaleString()}</b><br></br>
+            👤 Geändert von: <b>${entry.geaendertVon}</b><br></br>
+            ✏️ Änderung: <b>${entry.aenderung}</b><br></br>
+            <hr>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+                <button onclick="prevTimelineEntry()" ${currentTimelineIndex === 0 ? "disabled" : ""}>⬆ Vorherige</button>
+                <span>${currentTimelineIndex + 1} / ${allEntries.length}</span>
+                <button onclick="nextTimelineEntry()" ${currentTimelineIndex === allEntries.length - 1 ? "disabled" : ""}>⬇ Nächste</button>
+            </div>
+        </div>
+    `;
+}
+
+function prevTimelineEntry() {
+    if (currentTimelineIndex > 0) {
+        currentTimelineIndex--;
+        displayTimelineEntry();
+    }
+}
+
+function nextTimelineEntry() {
+    if (currentTimelineIndex < allEntries.length - 1) {
+        currentTimelineIndex++;
+        displayTimelineEntry();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function openGlobalTimeline() {
+    const startDateInput = document.getElementById("startDate");
+    const endDateInput = document.getElementById("endDate");
+
+    let today = new Date();
+    let twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(today.getDate() - 14);
+
+    startDateInput.value = twoWeeksAgo.toISOString().split("T")[0];
+    endDateInput.value = today.toISOString().split("T")[0];
+
+    document.getElementById("globalTimelinePopup").style.display = "block";
+    document.getElementById("globalTimelineOverlay").style.display = "block";
+
+    updateGlobalTimeline(); // Zeigt alle Änderungen der letzten 14 Tage an
+}
+
+// Funktion zum Filtern nach Zeitraum
+function filterGlobalTimeline() {
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+    updateGlobalTimeline(startDate, endDate);
+}
+
+// Funktion zum Zurücksetzen des Filters
+function clearGlobalTimelineFilter() {
+    document.getElementById("startDate").value = "";
+    document.getElementById("endDate").value = "";
+    updateGlobalTimeline(); // Zeigt wieder alle Änderungen an
+}
+
+// Funktion zum Schließen des Timeline-Popups
+function closeGlobalTimeline() {
+    document.getElementById("globalTimelinePopup").style.display = "none";
+    document.getElementById("globalTimelineOverlay").style.display = "none";
+}
+
+
+
+
+function parseDate(dateString) {
+    // Falls das Datum bereits ein Date-Objekt ist, direkt zurückgeben
+    if (dateString instanceof Date) return dateString;
+
+    console.log("Versuche, Datum zu parsen:", dateString);
+
+    // Prüfe Format "dd.mm.yyyy"
+    let dateParts = dateString.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+    if (dateParts) {
+        return new Date(dateParts[3], dateParts[2] - 1, dateParts[1]);
+    }
+
+    // Prüfe Format "yyyy-mm-dd" (ISO-Format)
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}/)) {
+        return new Date(dateString);
+    }
+
+    // Prüfe Format "dd/mm/yyyy"
+    dateParts = dateString.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (dateParts) {
+        return new Date(dateParts[3], dateParts[2] - 1, dateParts[1]);
+    }
+
+    // Versuche eine allgemeine Konvertierung
+    let parsedDate = new Date(dateString);
+    if (!isNaN(parsedDate.getTime())) {
+        return parsedDate;
+    }
+
+    console.error("Fehler: Konnte Datum nicht konvertieren", dateString);
+    return new Date(); // Fallback: aktuelles Datum zurückgeben
+}
+
+
+
+// Funktion zum Filtern nach Zeitraum
+function filterGlobalTimeline() {
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+    updateGlobalTimeline(startDate, endDate);
+}
+
+// Funktion zum Zurücksetzen des Filters
+function clearGlobalTimelineFilter() {
+    document.getElementById("startDate").value = "";
+    document.getElementById("endDate").value = "";
+    updateGlobalTimeline(); // Zeigt wieder alle Änderungen an
+}
+
+// Funktion zum Schließen des Timeline-Popups
+function closeGlobalTimeline() {
+    document.getElementById("globalTimelinePopup").style.display = "none";
+    document.getElementById("globalTimelineOverlay").style.display = "none";
+}
+
+
+
+
+
+// Funktion zum Filtern nach Zeitraum
+function filterGlobalTimeline() {
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+    updateGlobalTimeline(startDate, endDate);
+}
+
+// Funktion zum Zurücksetzen des Filters
+function clearGlobalTimelineFilter() {
+    document.getElementById("startDate").value = "";
+    document.getElementById("endDate").value = "";
+    updateGlobalTimeline(); // Zeigt wieder alle Änderungen an
+}
+
+// Funktion zum Schließen des Timeline-Popups
+function closeGlobalTimeline() {
+    document.getElementById("globalTimelinePopup").style.display = "none";
+    document.getElementById("globalTimelineOverlay").style.display = "none";
+}
+
+
+
+function updateArchiveUI() {
+    const archiveContainer = document.getElementById("archiveList");
+    archiveContainer.innerHTML = ""; // Vorherige Inhalte leeren
+
+    // Neue Tabelle für das Archiv erstellen
+    let tableHTML = `
+        <table id="archiveTable">
+            <thead>
+                <tr>
+                    <th>Stückzahl</th>
+                    <th>Kategorie</th>
+                    <th>Hersteller</th>
+                    <th>Artikel</th>
+                    <th>Seriennummer</th>
+                    <th>Artikelbeschreibung</th>
+                    <th>Anschaffungsdatum</th>
+                    <th>Zuletzt Geprüft</th>
+                    <th>Original Lagerort</th>
+                    <th>Lagerort</th>
+                    <th>Entleiher</th>
+                    <th>Projekt</th>
+                    <th>Ausleihdatum</th>
+                    <th>Geplante Rückgabe</th>
+                    <th>Notizen</th>
+                    <th>Bild</th>
+                    <th>Aktionen</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    // Archivierte Elemente als Tabellenzeilen hinzufügen
+    archivData.forEach((item, index) => {
+        tableHTML += `
+            <tr>
+                <td>${item.stueckzahl}</td>
+                <td>${item.kategorie}</td>
+                <td>${item.hersteller || ""}</td>
+                <td>${item.artikel || ""}</td>
+                <td>${item.seriennummer || ""}</td>
+                <td>${item.artikelbeschreibung || ""}</td>
+                <td>${formatDate(item.anschaffungsdatum)}</td>
+                <td>${formatDate(item.zuletztGeprueft)}</td>
+                <td>${item.originalLagerort || ""}</td>
+                <td>${item.lagerort || ""}</td>
+                <td>${item.borrower || ""}</td>
+                <td>${item.projectTitle || ""}</td>
+                <td>${formatDate(item.issueDate) || ""}</td>
+                <td>${formatDate(item.returnDate) || ""}</td>
+                <td>${item.notizen || ""}</td>
+                <td>
+                    ${
+                        item.artikelBildUrl
+                            ? `<a href="${item.artikelBildUrl}" target="_blank">
+                                <img src="${item.artikelBildUrl}" alt="" width="30" height="30" style="cursor: pointer;">
+                              </a>`
+                            : ""
+                    }
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="edit-btn" onclick="this.disabled = true; setTimeout(() => this.disabled = false, 500); editArchivedItem(${index})">Bearbeiten</button>
+
+
+                        <button class="timeline-btn" onclick="viewArchivedTimeline(${index})">Timeline</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    tableHTML += "</tbody></table>";
+    archiveContainer.innerHTML = tableHTML;
+}
+
+function editArchivedItem(index) {
+    console.log(`🔍 editArchivedItem aufgerufen! Index: ${index}`);
+    editItem(index, true); // 🔥 Setzt isArchived = true!
+
+    const item = archivData[index];
+
+    // Falls ein Datum nicht existiert, setzen wir einen leeren String ""
+    const safeDate = (dateStr) => dateStr ? new Date(dateStr).toISOString().split("T")[0] : "";
+
+    document.getElementById("popupContent").innerHTML = `
+        <div class="button-container">
+            <button id="unlockButton" onclick="unlockFields()">🔒</button>
+            <button class="restore-btn" id="restoreButton" onclick="restoreItem(${index})" disabled>Wiederherstellen</button>
+        </div>
+        <div class="form-grid">
+        <div>
+            <label>Hersteller</label>
+            <input type="text" id="edit_hersteller" value="${item.hersteller}" disabled>
+        </div>
+        <div>
+            <label>Artikel</label>
+            <input type="text" id="edit_artikel" value="${item.artikel}" disabled>
+        </div>
+        <div>
+            <label>Seriennummer</label>
+            <input type="text" id="edit_seriennummer" value="${item.seriennummer}" disabled>
+        </div>
+        <div>
+            <label>Kategorie</label>
+            <select id="edit_kategorie" disabled>
+                <option value="nichtdefiniert" ${item.kategorie === "nichtdefiniert" ? "selected" : ""}>Nicht definiert</option>
+                <option value="Kamera" ${item.kategorie === "Kamera" ? "selected" : ""}>Kamera</option>
+                <option value="Ton" ${item.kategorie === "Ton" ? "selected" : ""}>Ton</option>
+                <option value="Grip" ${item.kategorie === "Grip" ? "selected" : ""}>Grip</option>
+                <option value="Licht" ${item.kategorie === "Licht" ? "selected" : ""}>Licht</option>
+                <option value="Strom" ${item.kategorie === "Strom" ? "selected" : ""}>Strom</option>
+                <option value="Akku" ${item.kategorie === "Akku" ? "selected" : ""}>Akku</option>
+                <option value="Stative" ${item.kategorie === "Stative" ? "selected" : ""}>Stative</option>
+                <option value="Sonstiges" ${item.kategorie === "Sonstiges" ? "selected" : ""}>Sonstiges</option>
+            </select>
+        </div>
+        <div>
+            <label>Stückzahl</label>
+            <input type="number" id="edit_stueckzahl" value="${item.stueckzahl}" disabled>
+        </div>
+        <div>
+            <label>Artikelbeschreibung</label>
+            <textarea id="edit_artikelbeschreibung" disabled>${item.artikelbeschreibung}</textarea>
+        </div>
+        <div>
+            <label>Anschaffungsdatum</label>
+            <input type="date" id="edit_anschaffungsdatum" value="${safeDate(item.anschaffungsdatum)}" disabled>
+        </div>
+        <div>
+            <label>Zuletzt Geprüft</label>
+            <input type="date" id="edit_zuletztGeprueft" value="${safeDate(item.zuletztGeprueft)}">
+        </div>
+        <div>
+            <label>Bild-URL</label>
+            <input type="url" id="edit_artikelBildUrl" value="${item.artikelBildUrl}" placeholder="https://example.com/bild.jpg" disabled>
+        </div>
+        <div>
+            <label>Entleiher</label>
+            <input type="text" id="edit_borrower" value="${item.borrower}" disabled>
+        </div>
+        <div>
+            <label>Projekt</label>
+            <input type="text" id="edit_projectTitle" value="${item.projectTitle}" disabled>
+        </div>
+        <div>
+            <label>Ausleihdatum</label>
+            <input type="date" id="edit_issueDate" value="${safeDate(item.issueDate)}" disabled>
+        </div>
+        <div>
+            <label>Geplante Rückgabe</label>
+            <input type="date" id="edit_returnDate" value="${safeDate(item.returnDate)}" disabled>
+        </div>
+        <div class="full-width">
+            <label>Original Lagerort</label>
+            <input type="text" id="edit_originalLagerort" value="${item.originalLagerort}" disabled>
+        </div>
+        <div class="full-width">
+            <label>Lagerort</label>
+            <input type="text" id="edit_lagerort" value="${item.lagerort}">
+        </div>
+        <div class="full-width">
+            <label>Notizen</label>
+            <textarea id="edit_notizen">${item.notizen}</textarea>
+        </div>
+        </div>
+    `;
+
+    document.getElementById("overlay").style.display = "block";
+    document.getElementById("editPopup").style.display = "block";
+}
+function viewArchivedTimeline(index) {
+    const item = archivData[index];
+
+    if (!item || !item.timeline) {
+        console.error("Fehler: Timeline für dieses Archiv-Element nicht gefunden.");
+        return;
+    }
+
+    const popupTimelineList = document.getElementById("popupTimelineList");
+    if (!popupTimelineList) {
+        console.error("Fehler: popupTimelineList existiert nicht!");
+        return;
+    }
+
+    // Timeline-Einträge als Liste darstellen
+    popupTimelineList.innerHTML = item.timeline.length > 0
+        ? item.timeline.map(entry => `<li>${entry}</li>`).join("")
+        : "<li>Keine Änderungen protokolliert</li>";
+
+    // Popup sichtbar machen
+    document.getElementById("overlay").style.display = "block";
+    document.getElementById("timelinePopup").style.display = "block";
+}
+
+
+
+function restoreItem(index) {
+    if (confirm("Möchtest du dieses Element wiederherstellen?")) {
+        if (archivData[index]) {
+            // Element zurück in die Hauptliste verschieben
+            storedData.push(archivData[index]);
+
+            // Element aus dem Archiv entfernen
+            archivData.splice(index, 1);
+
+            // UI aktualisieren
+            updateTable();
+            updateArchiveUI();
+
+            // Popup schließen
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("editPopup").style.display = "none";
+        }
+    }
+}
+
+
+function updateUI() {
+    const mainContainer = document.getElementById("itemList"); // Passe das an deine UI an
+    mainContainer.innerHTML = "";
+
+    storedData.forEach((item, index) => {
+        const itemDiv = document.createElement("div");
+        itemDiv.innerHTML = `
+            <p><strong>${item.hersteller}</strong> - ${item.artikel}</p>
+            <button onclick="editItem(${index})">Bearbeiten</button>
+            <button onclick="deleteItem(${index})">Archivieren</button>
+        `;
+        mainContainer.appendChild(itemDiv);
+    });
+}
+
+
+function toggleArchive() {
+    const archiveSection = document.getElementById("archiveSection");
+    archiveSection.style.display = archiveSection.style.display === "none" ? "block" : "none";
+}
+
+function updateTable() {
+    console.log("📊 updateTable() wurde aufgerufen!");
+
+    const tableBody = document.querySelector("#techTable tbody");
+    if (!tableBody) {
+        console.error("❌ Fehler: Tabelle nicht gefunden!");
+        return;
+    }
+
+    console.log("📋 Daten für die Tabelle:", storedData); // Debugging-Log, um zu prüfen, ob die Daten vorhanden sind
+
+    tableBody.innerHTML = ""; // Löscht alte Einträge
+
+    if (!storedData || storedData.length === 0) {
+        console.warn("⚠ Keine Daten vorhanden. Tabelle bleibt leer.");
+        return;
+    }
+
+    storedData.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${item.stueckzahl}</td>
+            <td>${item.kategorie}</td>
+            <td>${item.hersteller || ""}</td>
+            <td>${item.artikel || ""}</td>
+            <td>${item.seriennummer || ""}</td>
+            <td>${item.artikelbeschreibung || ""}</td>
+            <td>${formatDate(item.anschaffungsdatum)}</td>
+            <td>${formatDate(item.zuletztGeprueft)}</td>
+            <td>${item.originalLagerort || ""}</td>
+            <td>${item.lagerort || ""}</td>
+            <td>${item.borrower || ""}</td>
+            <td>${item.projectTitle || ""}</td>
+            <td>${formatDate(item.issueDate) || ""}</td>
+            <td>${formatDate(item.returnDate) || ""}</td>
+            <td>${item.notizen || ""}</td>
+            <td>
+                ${
+                    item.artikelBildUrl
+                        ? `<a href="${item.artikelBildUrl}" target="_blank">
+                            <img src="${item.artikelBildUrl}" alt="" width="30" height="30" style="cursor: pointer;">
+                          </a>` 
+                        : ""
+                }
+            </td>
+            <td>
+                 <div class="action-buttons">
+                    <button class="edit-btn" onclick="editItem(${index})">Bearbeiten</button>
+                    <button class="timeline-btn" onclick="viewTimeline(${index})">Timeline</button>
+                 </div>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+
+    updateRowColors(); // Wendet die alternierenden Farben an
+    console.log("✅ Tabelle erfolgreich aktualisiert!");
+}
+
+
+
+// Funktion zum Anwenden der alternierenden Farben nach einer Suche oder Aktualisierung
+function updateRowColors() {
+    const visibleRows = Array.from(document.querySelectorAll("#techTable tbody tr"))
+        .filter(row => row.style.display !== "none"); // Nur sichtbare Zeilen berücksichtigen
+
+    visibleRows.forEach((row, index) => {
+        row.style.backgroundColor = index % 2 === 0 ? "#f9f9f9" : "#ffffff";
+    });
+}
+
+
+
+// Stelle sicher, dass die Farben nach einer Suche ebenfalls aktualisiert werden
+function searchTable() {
+    const filter = document.getElementById("searchInput").value.toLowerCase();
+    const rows = document.querySelectorAll("#techTable tbody tr");
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
+    });
+
+    updateRowColors(); // Wende die neuen Farben korrekt an
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+function showLoginPopup() {
+    console.log("🔑 Login-Popup wird geöffnet...");
+    document.getElementById("loginPopup").style.display = "block";
+    document.getElementById("loginOverlay").style.display = "block";
+}
+
+
+
+
+
+
+
+
+// 📌 Datenspeicherungsort Dropbox https://www.dropbox.com/home
+
+const DROPBOX_REFRESH_TOKEN = "xzsutoFu9osAAAAAAAAAAXX1qKYHc6nN5j1FLKOlokC56Cv2E_nLjWFIMOrdIEh1"; // Dein Refresh Token
+const DROPBOX_APP_KEY = "mz5sgnnacjubv3f"; // Dein App Key
+const DROPBOX_APP_SECRET = "jueljoyhc8vo26s"; // Dein App Secret
+let dropboxAccessToken = ""; // Hier wird das aktuelle Access Token gespeichert
+
+const FILE_NAME = "/Technik_Datenbank.json"; // Speicherort in Dropbox
+const LOCK_FILE_PATH = "/lock.json"; // Datei für die Sperre
+
+let localTimestamp = null; // Letzter Zeitstempel
+let isLocked = false; // Zeigt an, ob die Datei gesperrt ist
+
+
+// 📌 Funktion zum Abrufen eines neuen Access Tokens mit dem Refresh Token
+async function getNewAccessToken() {
+    try {
+        const response = await fetch("https://api.dropboxapi.com/oauth2/token", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+                refresh_token: DROPBOX_REFRESH_TOKEN,
+                grant_type: "refresh_token",
+                client_id: DROPBOX_APP_KEY,
+                client_secret: DROPBOX_APP_SECRET
+            })
+        });
+
+        const data = await response.json();
+        if (data.access_token) {
+            dropboxAccessToken = data.access_token;
+            console.log("✅ Neues Access Token erhalten:", dropboxAccessToken);
+        } else {
+            console.error("❌ Fehler beim Abrufen des Access Tokens:", data);
+        }
+    } catch (error) {
+        console.error("❌ Fehler beim Abrufen des Access Tokens:", error);
+    }
+}
+
+// 📌 Datei aus Dropbox abrufen (Force-Update)
+async function getFileContent() {
+    try {
+        if (!dropboxAccessToken) await getNewAccessToken();
+
+        const response = await fetch("https://content.dropboxapi.com/2/files/download", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${dropboxAccessToken}`,
+                "Dropbox-API-Arg": JSON.stringify({ path: FILE_NAME }),
+                "Cache-Control": "no-cache"
+            }
+        });
+
+        if (!response.ok) throw new Error("Fehler beim Abrufen der Datei.");
+
+        const text = await response.text();
+        const jsonData = JSON.parse(text);
+
+        console.log("📄 GELADENE JSON-DATEN:", jsonData); // 🔍 JSON-Inhalt anzeigen
+
+        // Falls timestamp fehlt, setze einen neuen
+        localTimestamp = jsonData.timestamp || Date.now();
+        return jsonData;
+    } catch (error) {
+        console.error("❌ Fehler beim Laden der Datei:", error);
+        return {}; // Gibt ein leeres Objekt zurück, um Fehler zu vermeiden
+    }
+}
+
+
+// 📌 Prüft die Metadaten der Datei in Dropbox
+async function checkFileMetaData() {
+    try {
+        if (!dropboxAccessToken) await getNewAccessToken();
+
+        const response = await fetch("https://api.dropboxapi.com/2/files/get_metadata", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${dropboxAccessToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ path: FILE_NAME })
+        });
+
+        if (!response.ok) throw new Error("Fehler beim Abrufen der Metadaten.");
+
+        const metadata = await response.json();
+        console.log(`📅 Letzte Änderung in Dropbox: ${metadata.server_modified}`);
+
+        return metadata.server_modified; // Gibt das letzte Änderungsdatum zurück
+    } catch (error) {
+        console.error("❌ Fehler beim Abrufen der Datei-Metadaten:", error);
+        return null;
+    }
+}
+
+
+
+async function loadFromDropbox() {
+    console.log("🕒 Lade Daten aus Dropbox...");
+
+    if (!dropboxAccessToken) await getNewAccessToken();
+
+    try {
+        const response = await fetch("https://content.dropboxapi.com/2/files/download", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${dropboxAccessToken}`,
+                "Dropbox-API-Arg": JSON.stringify({ path: FILE_NAME })
+            }
+        });
+
+        if (!response.ok) throw new Error("Fehler beim Laden der Datei.");
+
+        const text = await response.text();
+        const parsedData = JSON.parse(text);
+        storedData = parsedData.items || [];
+        archivData = parsedData.archiv || [];
+        borrowers = parsedData.borrowers || [];
+        localTimestamp = parsedData.timestamp || Date.now();
+        
+        updateTable();
+        updateSuggestions(); // Stellt sicher, dass Vorschläge erst nach dem Laden aktualisiert werden
+        console.log("✅ Daten erfolgreich aus Dropbox geladen!");
+    } catch (error) {
+        console.warn("⚠ Fehler beim Laden der Datei:", error);
+    }
+}
+
+
+
+
+
+
+let isManualSaving = false; // Variable, um manuelles Speichern zu erkennen
+
+async function saveToDropbox(isManual = false) {
+    if (isManual) {
+        isManualSaving = true;
+    }
+
+    console.log(isManual ? "🕒 Manuelles Speichern gestartet..." : "🕒 Autosave gestartet...");
+
+    if (!dropboxAccessToken) await getNewAccessToken();
+
+    // Falls `storedData` leer ist, lade zuerst die letzte Version aus Dropbox!
+    if (!storedData || storedData.length === 0) {
+        console.warn("⚠ ACHTUNG: `storedData` ist leer! Daten werden nicht gespeichert.");
+        showNotification("⚠ Fehler: Keine Daten zum Speichern!", true);
+        return;
+    }
+
+    let dataToSave = {
+        items: storedData,
+        archiv: archivData,
+        borrowers: borrowers,
+        timestamp: Date.now()
+    };
+
+    console.log("📤 SPEICHERE JSON-DATEN:", dataToSave); // Debugging-Log
+
+    try {
+        // 💾 Vor dem Speichern ein Backup anlegen
+        await fetch("https://content.dropboxapi.com/2/files/upload", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${dropboxAccessToken}`,
+                "Dropbox-API-Arg": JSON.stringify({
+                    path: FILE_NAME + ".backup.json",
+                    mode: "overwrite"
+                }),
+                "Content-Type": "application/octet-stream"
+            },
+            body: JSON.stringify(dataToSave)
+        });
+
+        // 🔄 Hauptdatei speichern
+        await fetch("https://content.dropboxapi.com/2/files/upload", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${dropboxAccessToken}`,
+                "Dropbox-API-Arg": JSON.stringify({
+                    path: FILE_NAME,
+                    mode: "overwrite"
+                }),
+                "Content-Type": "application/octet-stream"
+            },
+            body: JSON.stringify(dataToSave)
+        });
+
+        console.log("✅ Datei erfolgreich gespeichert!");
+        showNotification("✅ Datei erfolgreich gespeichert!", false);
+    } catch (error) {
+        console.error("❌ Fehler beim Speichern der Datei:", error);
+        showNotification("❌ Fehler beim Speichern der Datei!", true);
+    } finally {
+        isManualSaving = false;
+    }
+}
+
+
+
+
+
+
+
+
+// Autosave deaktivieren, wenn manuell gespeichert wird
+setInterval(() => {
+    if (!isManualSaving) {
+        saveToDropbox(false);
+    }
+}, 120000);
+
+
+let conflictCounter = 0; // Anzahl der Konflikte
+
+async function checkFileLock() {
+    try {
+        let response = await fetch("https://www.dropbox.com/s/DEINE_LOCK_DATEI.json?dl=1");
+        if (!response.ok) return false; // Falls Datei nicht existiert, gibt es keinen Lock
+
+        let lockData = await response.json();
+        if (lockData.lockedBy) {
+            alert("Die Datei wird gerade von " + lockData.lockedBy + " bearbeitet.");
+            return true;
+        }
+    } catch (error) {
+        console.error("Fehler beim Überprüfen des Locks:", error);
+    }
+    return false;
+}
+
+async function lockFileForEditing(user) {
+    let lockData = {
+        lockedBy: user,
+        timestamp: new Date().toISOString()
+    };
+
+    await saveToDropbox(lockData, "lock.json");
+}
+
+async function checkFileBeforeSaving(newData) {
+    try {
+        let response = await fetch("https://www.dropbox.com/s/DEINE_DATEI.json?dl=1");
+        let aktuelleDaten = await response.json();
+
+        if (aktuelleDaten.lastModified !== newData.lastModified) {
+            alert("Die Datei wurde in der Zwischenzeit geändert! Bitte neu laden.");
+            return false;
+        }
+
+        // Falls kein Konflikt → Version aktualisieren und speichern
+        newData.lastModified = new Date().toISOString();
+        await saveToDropbox(newData);
+        await unlockFile(); // Entsperren nach erfolgreichem Speichern
+        return true;
+    } catch (error) {
+        console.error("Fehler beim Prüfen der Datei:", error);
+    }
+    return false;
+}
+async function unlockFile() {
+    await saveToDropbox({}, "lock.json"); // Lock-Datei leeren
+}
+async function saveData(user, newData) {
+    // Prüfe, ob Datei gesperrt ist
+    if (await checkFileLock()) return;
+
+    // Datei sperren für Bearbeitung
+    await lockFileForEditing(user);
+
+    // Prüfen, ob Datei noch aktuell ist
+    let success = await checkFileBeforeSaving(newData);
+    if (!success) {
+        await unlockFile(); // Falls Fehler, Datei wieder entsperren
+    }
+}
+
+
+// 📌 Datei-Lock setzen (Sperrmechanismus)
+async function setFileLock() {
+    isLocked = true;
+    const lockData = { 
+        user: currentUser, 
+        timestamp: Date.now() 
+    };
+
+    await fetch("https://content.dropboxapi.com/2/files/upload", {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${dropboxAccessToken}`,
+            "Content-Type": "application/octet-stream",
+            "Dropbox-API-Arg": JSON.stringify({ path: LOCK_FILE_PATH, mode: "overwrite" })
+        },
+        body: JSON.stringify(JSON.stringify(lockData))
+    });
+
+    console.log(`🔒 Datei gesperrt von: ${currentUser}`);
+}
+
+
+// 📌 Datei-Lock aufheben
+async function releaseFileLock() {
+    try {
+        console.log("🔓 Datei-Sperre wird entfernt...");
+        isLocked = false;
+
+        await fetch("https://api.dropboxapi.com/2/files/delete_v2", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${dropboxAccessToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ path: LOCK_FILE_PATH })
+        });
+
+        console.log("✅ Datei-Sperre erfolgreich entfernt.");
+    } catch (error) {
+        console.warn("⚠ Fehler beim Entfernen der Datei-Sperre:", error);
+    }
+}
+
+
+
+
+
+// 📌 Prüfen, ob Datei gesperrt ist
+async function checkFileLock() {
+    try {
+        const response = await fetch("https://content.dropboxapi.com/2/files/download", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${dropboxAccessToken}`,
+                "Dropbox-API-Arg": JSON.stringify({ path: LOCK_FILE_PATH })
+            }
+        });
+
+        if (!response.ok) return false;
+
+        const lockData = await response.json();
+        if (lockData.user && lockData.user !== currentUser) {
+            alert(`🚫 Die Datei wird gerade von ${lockData.user} bearbeitet. Schreibgeschützt!`);
+            return true;
+        }
+
+        return false;
+    } catch (error) {
+        return false;
+    }
+}
+
+
+
+async function mergeChanges() {
+    const latestData = await getFileContent(); // Holt aktuelle Version aus Dropbox
+    let newData = { items: [], archiv: [], borrowers: [] };
+
+    // 🛠 Durch alle Zeilen gehen und nur Änderungen übernehmen
+    for (let i = 0; i < latestData.items.length; i++) {
+        newData.items[i] = storedData[i] ? storedData[i] : latestData.items[i]; // Falls PC1 eine Zeile geändert hat, bleibt sie bestehen
+    }
+
+    for (let i = 0; i < latestData.archiv.length; i++) {
+        newData.archiv[i] = archivData[i] ? archivData[i] : latestData.archiv[i];
+    }
+
+    for (let i = 0; i < latestData.borrowers.length; i++) {
+        newData.borrowers[i] = borrowers[i] ? borrowers[i] : latestData.borrowers[i];
+    }
+
+    return newData;
+}
+
+
+
+
+// 📌 Prüft regelmäßig, ob die Datei sich geändert hat
+async function checkForUpdates() {
+    const latestData = await getFileContent();
+    if (latestData.timestamp !== localTimestamp) {
+        alert("⚠ Die Datei wurde von einem anderen Benutzer geändert. Die Änderungen werden geladen.");
+        loadUpdatedFile();
+    }
+}
+
+// 📌 Lädt die aktuellste Datei-Version
+async function loadUpdatedFile() {
+    const newData = await getFileContent();
+    if (newData) {
+        storedData = newData.items || [];
+        archivData = newData.archiv || [];
+        borrowers = newData.borrowers || [];
+        updateTable();
+        console.log("🔄 Änderungen geladen.");
+        alert("🔄 Neueste Änderungen wurden übernommen.");
+    }
+}
+
+// 📌 Erfolgsmeldung anzeigen
+function showNotification(message, isError = false) {
+    let notification = document.getElementById("saveNotification");
+
+    // Falls noch keine Benachrichtigung existiert, erstelle eine
+    if (!notification) {
+        notification = document.createElement("div");
+        notification.id = "saveNotification";
+        notification.style.cssText = `
+            position: fixed;
+            top: 300px; /* Tiefer platziert */
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px; /* Größeres Padding */
+            border-radius: 8px;
+            font-size: 18px; /* Größere Schrift */
+            font-weight: bold;
+            z-index: 9999;
+            text-align: center;
+            background-color: ${isError ? "#d9534f" : "#5cb85c"}; /* Rot für Fehler, Grün für Erfolg */
+            color: white;
+            opacity: 1;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Leichter Schatten */
+            transition: opacity 0.5s ease-in-out, top 0.5s ease-in-out;
+        `;
+        document.body.appendChild(notification);
+    }
+
+    // Setze die Nachricht
+    notification.textContent = message;
+
+    // Einblenden mit Slide-Effekt
+    notification.style.top = "200px"; // Endposition noch tiefer
+
+    // Blendet sich nach 3 Sekunden aus und wird entfernt
+    setTimeout(() => {
+        notification.style.opacity = "0";
+        notification.style.top = "150px"; // Zurückgleiten
+        setTimeout(() => notification.remove(), 500);
+    }, 5000);
+}
+
+
+
+
+// 📌 Initialisierung beim Laden der Seite
+document.addEventListener("DOMContentLoaded", async () => {
+    await getNewAccessToken();
+    showLoginPopup(); // Zeigt das Login-Popup an
 });
 
-// Standardwerte setzen: "Anschaffungsdatum" ausblenden
-//document.addEventListener("DOMContentLoaded", function() {
-//	    document.querySelector('.column-checkbox[data-column="3"]').checked = false;
-//    document.querySelector('.column-checkbox[data-column="3"]').dispatchEvent(new Event("change"));
-//});
-	reader.onload = function(e) {
-    try {
-        const importedData = JSON.parse(e.target.result);
-        if (!Array.isArray(importedData)) throw new Error("Ungültiges Format");
-        storedData = importedData;
-        updateTable();
-        alert("Daten erfolgreich importiert!");
-    } catch (error) {
-        alert("Fehler beim Importieren: " + error.message);
+// 🔄 Starte automatisches Speichern alle 30 Sekunden
+setInterval(() => saveToDropbox(false), 300000);
+
+async function manualSave() {
+    let button = document.getElementById("manualSaveButton");
+    button.disabled = true; // Button deaktivieren
+
+    console.log("🕒 Manuelles Speichern gestartet...");
+    await saveToDropbox(true);
+
+    setTimeout(() => { button.disabled = false; }, 3000); // Nach 3 Sekunden wieder aktivieren
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+async function updateSuggestions() {
+    let herstellerSet = new Set();
+    let artikelSet = new Set();
+    let originalLagerortSet = new Set();
+    let lagerortSet = new Set();
+    let artikelbeschreibungSet = new Set();
+    console.log("🔍 Aktualisiere Vorschläge...");
+
+    if (!storedData || storedData.length === 0) {
+        console.warn("⚠ Keine Daten für Vorschläge gefunden. Warte auf Dropbox-Synchronisation...");
+        return;
     }
-};	
-		
+
+
+    // Hersteller, Artikel, Lagerorte und Artikelbeschreibungen aus gespeicherten Daten sammeln
+    storedData.forEach(item => {
+        if (item.hersteller && item.hersteller.trim() !== "") herstellerSet.add(item.hersteller.trim());
+        if (item.artikel && item.artikel.trim() !== "") artikelSet.add(item.artikel.trim());
+        if (item.originalLagerort && item.originalLagerort.trim() !== "") originalLagerortSet.add(item.originalLagerort.trim());
+        if (item.lagerort && item.lagerort.trim() !== "") lagerortSet.add(item.lagerort.trim());
+        if (item.artikelbeschreibung && item.artikelbeschreibung.trim() !== "") artikelbeschreibungSet.add(item.artikelbeschreibung.trim());
+    });
+
+    // Speichert alle Sets für spätere Filterung
+    let dataLists = {
+        herstellerListe: Array.from(herstellerSet),
+        artikelListe: Array.from(artikelSet),
+        originalLagerortListe: Array.from(originalLagerortSet),
+        lagerortListe: Array.from(lagerortSet)
+    };
+
+    // Event-Listener für normale Eingabefelder (mit `datalist`)
+    Object.keys(dataLists).forEach(datalistId => {
+        let inputField = document.getElementById(datalistId.replace("Liste", ""));
+        let datalist = document.getElementById(datalistId);
+
+        if (inputField && datalist) {
+            inputField.addEventListener("input", function () {
+                let value = this.value.trim().toLowerCase();
+
+                if (value.length >= 1) {
+                    datalist.innerHTML = "";
+                    let filteredSuggestions = dataLists[datalistId].filter(item =>
+                        item.toLowerCase().includes(value)
+                    );
+
+                    filteredSuggestions.forEach(suggestion => {
+                        let option = document.createElement("option");
+                        option.value = suggestion;
+                        datalist.appendChild(option);
+                    });
+                } else {
+                    datalist.innerHTML = ""; // Löscht Vorschläge, wenn weniger als 2 Zeichen eingegeben sind
+                }
+            });
+        }
+    });
+
+    // 🔥 Dynamisches Dropdown für Artikelbeschreibung
+    let artikelbeschreibungDropdown = document.getElementById("artikelbeschreibungDropdown");
+    let artikelbeschreibungInput = document.getElementById("artikelbeschreibung");
+
+    artikelbeschreibungInput.addEventListener("input", function () {
+        let value = this.value.trim().toLowerCase();
+        if (value.length < 2) {
+            artikelbeschreibungDropdown.style.display = "none";
+            return;
+        }
+
+        artikelbeschreibungDropdown.innerHTML = "";
+        let filteredSuggestions = Array.from(artikelbeschreibungSet).filter(desc =>
+            desc.toLowerCase().includes(value)
+        );
+
+        if (filteredSuggestions.length > 0) {
+            artikelbeschreibungDropdown.style.display = "block";
+            filteredSuggestions.forEach(suggestion => {
+                let div = document.createElement("div");
+                div.textContent = suggestion;
+                div.addEventListener("click", function () {
+                    artikelbeschreibungInput.value = suggestion;
+                    artikelbeschreibungDropdown.style.display = "none";
+                });
+                artikelbeschreibungDropdown.appendChild(div);
+            });
+        } else {
+            artikelbeschreibungDropdown.style.display = "none";
+        }
+    });
+
+    // Verstecke das Dropdown, wenn der Nutzer irgendwo anders klickt
+    document.addEventListener("click", function (event) {
+        if (!artikelbeschreibungInput.contains(event.target) && !artikelbeschreibungDropdown.contains(event.target)) {
+            artikelbeschreibungDropdown.style.display = "none";
+        }
+    });
+}
+
+
+setInterval(async () => {
+    const latestData = await getFileContent();
+    if (latestData.timestamp !== localTimestamp) {
+        console.log("🔄 Neuste Datei geladen...");
+        storedData = latestData.items;
+        archivData = latestData.archiv;
+        borrowers = latestData.borrowers;
+        localTimestamp = latestData.timestamp;
+        updateTable(); // Falls du eine UI hast
+    }
+}, 5000);
+
+async function autoLoadFromDropbox() {
+    setInterval(async () => {
+        console.log("🔄 Überprüfe Dropbox auf neue Änderungen...");
+
+        const latestData = await getFileContent(); // Holt aktuelle Version aus Dropbox
+
+        console.log("📄 JSON-Datei aus Dropbox:", latestData); // Prüft JSON-Daten
+
+        if (latestData.timestamp !== localTimestamp) {
+            console.log("🔄 Änderungen erkannt! Lade neue Daten...");
+            storedData = latestData.items || [];
+            archivData = latestData.archiv || [];
+            borrowers = latestData.borrowers || [];
+
+            console.log("📋 GELADENE `storedData`:", storedData); // Debugging-Log
+
+            localTimestamp = latestData.timestamp;
+            updateTable(); // Aktualisiert die Tabelle
+            showNotification("🔄 Neue Daten aus Dropbox geladen!", false);
+        }
+    }, 5000);
+}
+
+
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+    console.log("🚀 Starte automatische Dropbox-Synchronisation...");
+    autoLoadFromDropbox(); // Startet die automatische Synchronisation
+});
+
+
     </script>
 </body>
 </html>
